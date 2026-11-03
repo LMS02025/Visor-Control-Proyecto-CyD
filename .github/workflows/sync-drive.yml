@@ -1,0 +1,38 @@
+name: Sincronizar Libro de Obra desde Drive
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # cada 30 minutos (GitHub puede demorar las ejecuciones programadas)
+  workflow_dispatch: {}       # ejecución manual desde la pestaña Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-drive
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Dependencias
+        run: pip install --quiet google-api-python-client google-auth pypdf
+      - name: Sincronizar folios nuevos
+        env:
+          GDRIVE_SA_KEY: ${{ secrets.GDRIVE_SA_KEY }}
+        run: |
+          if [ -z "$GDRIVE_SA_KEY" ]; then echo "::error::Falta el secret GDRIVE_SA_KEY"; exit 1; fi
+          python scripts/sync_drive.py
+      - name: Publicar cambios
+        run: |
+          if git diff --quiet -- data; then echo "Sin folios nuevos"; exit 0; fi
+          git config user.name "drive-sync[bot]"
+          git config user.email "drive-sync@users.noreply.github.com"
+          git add data
+          git commit -m "Sincroniza folios nuevos del Libro de Obra Digital"
+          git push

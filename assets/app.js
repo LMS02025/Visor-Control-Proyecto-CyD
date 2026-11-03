@@ -1,0 +1,277 @@
+/* Visor Control Proyecto CyD — Libro de Obra Digital (Construcción) */
+(() => {
+  'use strict';
+  const PERIODO_MS = 5 * 60 * 1000;           // ciclo de actualización: 5 minutos
+  const ROTACION_MS = 12 * 1000;              // modo presentación: cambio de vista
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const motion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const state = { folios: [], materias: [], meta: {}, prevIds: null, nuevos: new Set(), sortKey: 'folio', sortDir: -1, view: 'todo', next: 0, loading: false };
+
+  /* ---------- Sonido (Web Audio, sin archivos externos) ---------- */
+  const audio = { ctx: null, on: true };
+  const unlock = () => { if (!audio.ctx) { try { audio.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { audio.ctx = null; } } if (audio.ctx && audio.ctx.state === 'suspended') audio.ctx.resume(); };
+  const tone = (freq, t0, dur, type = 'sine', vol = 0.08) => {
+    const c = audio.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, c.currentTime + t0);
+    g.gain.exponentialRampToValueAtTime(vol, c.currentTime + t0 + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + t0 + dur);
+    o.connect(g).connect(c.destination); o.start(c.currentTime + t0); o.stop(c.currentTime + t0 + dur + 0.05);
+  };
+  const SONIDOS = {
+    click: () => tone(1200, 0, 0.05, 'triangle', 0.05),
+    vista: () => { tone(660, 0, 0.12, 'sine', 0.06); tone(990, 0.07, 0.14, 'sine', 0.05); },
+    inicio: () => { tone(440, 0, 0.12, 'triangle', 0.05); tone(554, 0.09, 0.12, 'triangle', 0.05); },
+    ok: () => { tone(523, 0, 0.16, 'sine', 0.07); tone(784, 0.12, 0.26, 'sine', 0.06); },
+    nuevo: () => { tone(659, 0, 0.18, 'sine', 0.08); tone(880, 0.14, 0.18, 'sine', 0.08); tone(1319, 0.28, 0.4, 'sine', 0.07); },
+    error: () => { tone(220, 0, 0.25, 'sawtooth', 0.05); tone(196, 0.2, 0.3, 'sawtooth', 0.05); },
+  };
+  const play = (k) => { if (!audio.on || !audio.ctx || audio.ctx.state !== 'running') return; try { SONIDOS[k](); } catch (e) { /* sin audio */ } };
+  document.addEventListener('pointerdown', unlock, { once: false, passive: true });
+
+  /* ---------- Utilidades ---------- */
+  const fmtFecha = (iso) => { const [y, m, d] = String(iso).split('-'); return `${d}/${m}/${y}`; };
+  const MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  const fmtMes = (ym) => `${MES[+ym.slice(5, 7) - 1]} ${ym.slice(2, 4)}`;
+  const hoyISO = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Santiago' });
+  const diasEntre = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
+  const estadoClase = (e) => ({ 'Aprobado': 'st-ok', 'Cerrado': 'st-ok', 'Aprobado con condiciones': 'st-ok', 'Observado': 'st-bad', 'En revisión': 'st-warn', 'Sin pronunciamiento': 'st-warn', 'Por revisar': 'st-new' })[e] || 'st-mut';
+  const parte = (r) => ({ IF: 'Inspección Fiscal', SC: 'Sociedad Concesionaria' })[r] || r;
+  const cell = (tr, txt, cls) => { const c = tr.insertCell(); c.textContent = txt; if (cls) c.className = cls; return c; };
+  const badge = (td, txt, cls) => { const s = document.createElement('span'); s.className = 'badge ' + (cls || estadoClase(txt)); s.textContent = txt; td.appendChild(s); };
+  const median = (xs) => (xs.length ? (xs[(xs.length - 1) >> 1] + xs[xs.length >> 1]) / 2 : null);
+
+  const tip = $('#tip');
+  const showTip = (ev, head, lines) => {
+    tip.replaceChildren();
+    const h = document.createElement('div'); h.className = 'h'; h.textContent = head; tip.appendChild(h);
+    lines.forEach((l) => { const d = document.createElement('div'); d.textContent = l; tip.appendChild(d); });
+    tip.hidden = false;
+    const x = Math.min(ev.clientX + 14, innerWidth - tip.offsetWidth - 8), y = Math.min(ev.clientY + 14, innerHeight - tip.offsetHeight - 8);
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  };
+  const hideTip = () => { tip.hidden = true; };
+  const toast = (msg) => { const t = $('#toast'); t.hidden = true; void t.offsetWidth; t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => { t.hidden = true; }, 3700); };
+
+  /* ---------- Cálculos ---------- */
+  function calcular() {
+    const { folios, materias } = state;
+    const byId = new Map(folios.map((f) => [+f.folio, f]));
+    const respuestas = [];
+    for (const f of folios) {
+      const refs = String(f.refs || '').split(';').filter(Boolean).map(Number).filter((r) => byId.has(r) && byId.get(r).emisor !== f.emisor);
+      if (!refs.length) continue;
+      const r = Math.max(...refs);
+      respuestas.push({ folio: +f.folio, ref: r, responde: f.emisor, materia: f.materia, fecha: f.fecha, dias: diasEntre(byId.get(r).fecha, f.fecha) });
+    }
+    const corte = hoyISO();
+    const mat = materias.map((m) => {
+      const fs = folios.filter((f) => f.materia_id === m.materia_id);
+      const last = fs.reduce((a, b) => (+b.folio > +a.folio ? b : a), fs[0] || { folio: 0, fecha: corte });
+      return { ...m, n_folios: fs.length, ultimo_folio: +last.folio, fecha_ultimo: last.fecha, dias_desde: diasEntre(last.fecha, corte) };
+    }).filter((m) => m.n_folios > 0);
+    const dias = (p) => respuestas.filter((r) => r.responde === p).map((r) => r.dias).sort((a, b) => a - b);
+    const fechas = folios.map((f) => f.fecha).sort();
+    const kpi = {
+      total: folios.length, primera: fechas[0], ultima: fechas[fechas.length - 1],
+      sc: folios.filter((f) => f.emisor === 'SC').length, if_: folios.filter((f) => f.emisor === 'IF').length,
+      pend_if: mat.filter((m) => m.responde === 'IF').length, pend_sc: mat.filter((m) => m.responde === 'SC').length,
+      med_resp_if: median(dias('IF')), med_resp_sc: median(dias('SC')),
+    };
+    return { respuestas, mat, kpi };
+  }
+
+  /* ---------- Dibujo ---------- */
+  function drawKpis(kpi) {
+    $$('[data-k]').forEach((el) => {
+      const v = kpi[el.dataset.k];
+      if (v == null) { el.textContent = '—'; return; }
+      if (typeof v === 'string') { el.textContent = fmtFecha(v); return; }
+      const prev = +el.dataset.v || 0; el.dataset.v = v;
+      const fmt = Number.isInteger(v) ? d3.format(',') : d3.format(',.1f');
+      if (!motion) { el.textContent = fmt(v); return; }
+      d3.select(el).transition().duration(900).ease(d3.easeCubicOut)
+        .tween('text', () => { const i = d3.interpolateNumber(prev, v); return (t) => { el.textContent = fmt(t < 1 ? Math.round(i(t) * 10) / 10 : v); }; });
+    });
+  }
+
+  function drawPendientes(mat) {
+    const tb = $('#t-pend'); tb.replaceChildren();
+    mat.filter((m) => m.responde === 'IF' || m.responde === 'SC').sort((a, b) => b.dias_desde - a.dias_desde).forEach((m, i) => {
+      const tr = tb.insertRow(); if (motion) tr.style.animation = `rise .45s ${i * 0.04}s both`;
+      cell(tr, m.materia); cell(tr, m.articulo, 'dim');
+      badge(cell(tr, ''), parte(m.responde), m.responde === 'IF' ? 'st-warn' : 'st-bad');
+      badge(cell(tr, ''), m.estado);
+      cell(tr, 'F' + m.ultimo_folio, 'num'); cell(tr, d3.format(',')(m.dias_desde), 'num'); cell(tr, m.situacion, 'wrap');
+    });
+  }
+
+  function drawMaterias(mat) {
+    const tb = $('#t-mat'); tb.replaceChildren();
+    const max = d3.max(mat, (m) => m.n_folios) || 1;
+    mat.forEach((m) => {
+      const tr = tb.insertRow();
+      cell(tr, m.materia); cell(tr, m.articulo, 'dim'); badge(cell(tr, ''), m.estado);
+      const c = cell(tr, ''); const b = document.createElement('span'); b.className = 'minibar'; b.style.width = '0'; c.append(b, String(m.n_folios));
+      requestAnimationFrame(() => { b.style.transition = motion ? 'width .8s cubic-bezier(.2,.8,.2,1)' : ''; b.style.width = (48 * m.n_folios / max) + 'px'; });
+      cell(tr, `${fmtFecha(m.fecha_ultimo)} · F${m.ultimo_folio}`, 'dim'); cell(tr, m.situacion, 'wrap');
+    });
+  }
+
+  const dur = () => (motion ? 800 : 0);
+  function drawMes() {
+    const el = $('#c-mes'); el.replaceChildren();
+    const meses = [...new Set(state.folios.map((f) => f.fecha.slice(0, 7)))].sort();
+    const data = meses.map((m) => ({ mes: m, SC: state.folios.filter((f) => f.fecha.startsWith(m) && f.emisor === 'SC').length, IF: state.folios.filter((f) => f.fecha.startsWith(m) && f.emisor === 'IF').length }));
+    const W = el.clientWidth || 500, H = 230, mg = { t: 10, r: 8, b: 26, l: 30 };
+    const x = d3.scaleBand(meses, [mg.l, W - mg.r]).padding(0.3);
+    const y = d3.scaleLinear([0, d3.max(data, (d) => d.SC + d.IF) || 1], [H - mg.b, mg.t]).nice();
+    const svg = d3.select(el).append('svg').attr('viewBox', `0 0 ${W} ${H}`);
+    svg.append('g').attr('class', 'grid').selectAll('line').data(y.ticks(4)).join('line').attr('x1', mg.l).attr('x2', W - mg.r).attr('y1', y).attr('y2', y);
+    svg.append('g').selectAll('text').data(y.ticks(4)).join('text').attr('x', mg.l - 6).attr('y', (v) => y(v) + 4).attr('text-anchor', 'end').text(d3.format('d'));
+    svg.append('g').selectAll('text').data(meses).join('text').attr('x', (m) => x(m) + x.bandwidth() / 2).attr('y', H - 8).attr('text-anchor', 'middle').text(fmtMes);
+    const bw = Math.min(34, x.bandwidth()), bx = (d) => x(d.mes) + (x.bandwidth() - bw) / 2;
+    const g = svg.append('g').selectAll('g').data(data).join('g');
+    g.append('rect').attr('x', bx).attr('width', bw).attr('rx', 3).attr('fill', css('--sc')).attr('y', y(0)).attr('height', 0)
+      .transition().duration(dur()).delay((d, i) => i * 70).attr('y', (d) => y(d.SC)).attr('height', (d) => y(0) - y(d.SC));
+    g.append('rect').attr('x', bx).attr('width', bw).attr('rx', 3).attr('fill', css('--if')).attr('y', y(0)).attr('height', 0)
+      .transition().duration(dur()).delay((d, i) => 250 + i * 70).attr('y', (d) => y(d.SC + d.IF)).attr('height', (d) => y(d.SC) - y(d.SC + d.IF));
+    g.append('text').attr('x', (d) => bx(d) + bw / 2).attr('text-anchor', 'middle').attr('y', (d) => y(d.SC + d.IF) - 5).text((d) => d.SC + d.IF).attr('opacity', 0).transition().delay(dur() + 200).attr('opacity', 1);
+    g.append('rect').attr('x', (d) => x(d.mes)).attr('width', x.bandwidth()).attr('y', mg.t).attr('height', H - mg.t - mg.b).attr('fill', 'transparent')
+      .on('pointermove', (ev, d) => showTip(ev, fmtMes(d.mes), [`Sociedad Concesionaria: ${d.SC}`, `Inspección Fiscal: ${d.IF}`, `Total: ${d.SC + d.IF}`])).on('pointerleave', hideTip);
+  }
+
+  function drawPrio() {
+    const el = $('#c-prio'); el.replaceChildren();
+    const ps = ['Alta', 'Media', 'Baja'];
+    const data = ps.map((p) => ({ p, SC: state.folios.filter((f) => f.prioridad === p && f.emisor === 'SC').length, IF: state.folios.filter((f) => f.prioridad === p && f.emisor === 'IF').length }));
+    const W = el.clientWidth || 500, H = 230, mg = { t: 10, r: 40, b: 10, l: 56 };
+    const y = d3.scaleBand(ps, [mg.t, H - mg.b]).padding(0.35);
+    const x = d3.scaleLinear([0, d3.max(data, (d) => d.SC + d.IF) || 1], [mg.l, W - mg.r]);
+    const svg = d3.select(el).append('svg').attr('viewBox', `0 0 ${W} ${H}`);
+    const bh = Math.min(34, y.bandwidth()), by = (d) => y(d.p) + (y.bandwidth() - bh) / 2;
+    const g = svg.append('g').selectAll('g').data(data).join('g');
+    g.append('text').attr('x', mg.l - 8).attr('y', (d) => by(d) + bh / 2 + 4).attr('text-anchor', 'end').text((d) => d.p);
+    g.append('rect').attr('x', mg.l).attr('y', by).attr('height', bh).attr('rx', 3).attr('fill', css('--sc')).attr('width', 0)
+      .transition().duration(dur()).delay((d, i) => i * 90).attr('width', (d) => x(d.SC) - mg.l);
+    g.append('rect').attr('x', mg.l).attr('y', by).attr('height', bh).attr('rx', 3).attr('fill', css('--if')).attr('width', 0)
+      .transition().duration(dur()).delay((d, i) => 250 + i * 90).attr('x', (d) => x(d.SC)).attr('width', (d) => x(d.SC + d.IF) - x(d.SC));
+    g.append('text').attr('x', (d) => x(d.SC + d.IF) + 6).attr('y', (d) => by(d) + bh / 2 + 4).text((d) => d.SC + d.IF).attr('opacity', 0).transition().delay(dur() + 200).attr('opacity', 1);
+    g.append('rect').attr('x', mg.l).attr('y', (d) => y(d.p)).attr('height', y.bandwidth()).attr('width', W - mg.l - mg.r).attr('fill', 'transparent')
+      .on('pointermove', (ev, d) => showTip(ev, `Prioridad ${d.p.toLowerCase()}`, [`Sociedad Concesionaria: ${d.SC}`, `Inspección Fiscal: ${d.IF}`])).on('pointerleave', hideTip);
+  }
+
+  function drawResp(respuestas, med) {
+    const el = $('#c-resp'); el.replaceChildren();
+    const rows = respuestas.filter((r) => r.responde === 'IF').sort((a, b) => a.folio - b.folio);
+    const W = el.clientWidth || 800, bh = 16, gap = 6, mg = { t: 24, r: 44, b: 10, l: 96 };
+    const H = mg.t + rows.length * (bh + gap) + mg.b;
+    const x = d3.scaleLinear([0, d3.max(rows, (r) => r.dias) || 1], [mg.l, W - mg.r]).nice();
+    const svg = d3.select(el).append('svg').attr('viewBox', `0 0 ${W} ${H}`);
+    svg.append('g').attr('class', 'grid').selectAll('line').data(x.ticks(6)).join('line').attr('x1', x).attr('x2', x).attr('y1', mg.t - 4).attr('y2', H - mg.b);
+    svg.append('g').selectAll('text').data(x.ticks(6)).join('text').attr('x', x).attr('y', 12).attr('text-anchor', 'middle').text((v) => `${v} d`);
+    const g = svg.append('g').selectAll('g').data(rows).join('g').attr('transform', (r, i) => `translate(0,${mg.t + i * (bh + gap)})`);
+    g.append('text').attr('x', mg.l - 8).attr('y', bh - 4).attr('text-anchor', 'end').text((r) => `F${r.folio} ← F${r.ref}`);
+    g.append('rect').attr('x', mg.l).attr('height', bh).attr('rx', 3).attr('width', 0)
+      .attr('fill', (r) => (med != null && r.dias > med ? css('--if') : css('--muted'))).attr('opacity', (r) => (med != null && r.dias > med ? 1 : 0.45))
+      .transition().duration(dur()).delay((r, i) => i * 30).attr('width', (r) => Math.max(1, x(r.dias) - mg.l));
+    g.append('text').attr('x', (r) => x(r.dias) + 6).attr('y', bh - 4).text((r) => r.dias).attr('opacity', 0).transition().delay(dur() + rows.length * 30).attr('opacity', 1);
+    g.append('rect').attr('width', W).attr('height', bh + gap).attr('y', -gap / 2).attr('fill', 'transparent')
+      .on('pointermove', (ev, r) => showTip(ev, `Folio ${r.folio} · ${fmtFecha(r.fecha)}`, [r.materia, `Responde al folio ${r.ref} en ${r.dias} días`])).on('pointerleave', hideTip);
+    if (med != null) {
+      svg.append('line').attr('class', 'med').attr('x1', x(med)).attr('x2', x(med)).attr('y1', mg.t - 4).attr('y2', H - mg.b);
+      svg.append('text').attr('x', x(med) + 5).attr('y', H - mg.b - 2).style('fill', css('--fg')).text(`mediana ${med} d`);
+    }
+  }
+
+  function drawRegistro() {
+    const tb = $('#t-reg'); tb.replaceChildren();
+    const q = $('#q').value.toLowerCase().trim(), em = $('#f-em').value, pr = $('#f-pr').value;
+    const num = (k) => k === 'folio' || k === 'adjuntos', { sortKey: k, sortDir: s } = state;
+    state.folios.filter((f) => (!em || f.emisor === em) && (!pr || f.prioridad === pr) && (!q || [f.folio, f.asunto, f.materia, f.por, f.para, f.tipo, f.refs].join(' ').toLowerCase().includes(q)))
+      .sort((a, b) => s * (num(k) ? +a[k] - +b[k] : String(a[k]).localeCompare(String(b[k]), 'es')))
+      .forEach((f) => {
+        const tr = tb.insertRow(); if (state.nuevos.has(+f.folio)) tr.className = 'row-new';
+        cell(tr, String(f.folio), 'num'); cell(tr, `${fmtFecha(f.fecha)} ${f.hora || ''}`, 'dim'); cell(tr, f.emisor); cell(tr, f.por); cell(tr, f.tipo); cell(tr, f.prioridad);
+        const cm = cell(tr, f.materia); if (f.revisar) { cm.append(' '); badge(cm, 'Por revisar'); }
+        cell(tr, f.asunto, 'wrap'); cell(tr, f.refs ? f.refs.split(';').map((r) => 'F' + r).join(', ') : '', 'dim'); cell(tr, String(f.adjuntos ?? ''), 'num');
+        const c = tr.insertCell(); const a = document.createElement('a'); a.href = f.enlace; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Abrir'; c.appendChild(a);
+      });
+    $$('#t-reg-tab th[data-sort]').forEach((th) => th.setAttribute('aria-sort', th.dataset.sort === k ? (s > 0 ? 'ascending' : 'descending') : 'none'));
+  }
+
+  function render() {
+    const { respuestas, mat, kpi } = calcular();
+    drawKpis(kpi); drawPendientes(mat); drawMaterias(mat); drawMes(); drawPrio(); drawResp(respuestas, kpi.med_resp_if); drawRegistro();
+  }
+
+  /* ---------- Carga y actualización ---------- */
+  async function getJSON(path) { const r = await fetch(`${path}?t=${Date.now()}`, { cache: 'no-store' }); if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`); return r.json(); }
+  async function actualizar(origen) {
+    if (state.loading) return; state.loading = true;
+    const btn = $('#btn-act'); btn.classList.add('spin'); $('#estado-sync').textContent = 'Actualizando contenido…';
+    if (origen !== 'inicio') play('inicio');
+    try {
+      const [folios, materias, meta] = await Promise.all([getJSON('data/folios.json'), getJSON('data/materias.json'), getJSON('data/meta.json').catch(() => ({}))]);
+      const ids = new Set(folios.map((f) => +f.folio));
+      state.nuevos = state.prevIds ? new Set([...ids].filter((i) => !state.prevIds.has(i))) : new Set();
+      state.prevIds = ids; state.folios = folios; state.materias = materias; state.meta = meta;
+      render();
+      $$('.card, .tile, .takeaway').forEach((c) => { c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); });
+      const hora = new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const sync = meta.sincronizado ? ` · Drive sincronizado ${new Date(meta.sincronizado).toLocaleString('es-CL')}` : '';
+      $('#estado-sync').textContent = `Actualizado a las ${hora}${sync}`;
+      if (state.nuevos.size) { toast(`${state.nuevos.size} folio(s) nuevo(s): ${[...state.nuevos].map((n) => 'F' + n).join(', ')}`); play('nuevo'); }
+      else if (origen !== 'inicio') { toast('Contenido actualizado · sin folios nuevos'); play('ok'); }
+    } catch (e) {
+      $('#estado-sync').textContent = `No se pudo actualizar (${e.message}). Se mantiene la última información.`; play('error');
+    } finally {
+      btn.classList.remove('spin'); state.loading = false; state.next = Date.now() + PERIODO_MS;
+    }
+  }
+
+  // Barra de actualización: ciclo de 5 minutos.
+  setInterval(() => {
+    const rest = Math.max(0, state.next - Date.now());
+    $('#bar-fill').style.width = `${100 * (1 - rest / PERIODO_MS)}%`;
+    const m = Math.floor(rest / 60000), s = Math.floor((rest % 60000) / 1000);
+    $('#cuenta').textContent = `Próxima actualización en ${m}:${String(s).padStart(2, '0')}`;
+    if (rest === 0 && !state.loading) actualizar('auto');
+  }, 1000);
+
+  /* ---------- Controles ---------- */
+  $('#btn-act').addEventListener('click', () => { unlock(); actualizar('manual'); });
+  $('#btn-son').addEventListener('click', (e) => {
+    unlock(); audio.on = !audio.on; e.currentTarget.setAttribute('aria-pressed', String(audio.on));
+    e.currentTarget.title = audio.on ? 'Sonido activado' : 'Sonido desactivado'; if (audio.on) play('click');
+  });
+  const menu = $('#menu-ver'), btnVer = $('#btn-ver');
+  btnVer.addEventListener('click', () => { unlock(); play('click'); menu.hidden = !menu.hidden; btnVer.setAttribute('aria-expanded', String(!menu.hidden)); });
+  document.addEventListener('click', (e) => { if (!e.target.closest('.menu')) { menu.hidden = true; btnVer.setAttribute('aria-expanded', 'false'); } });
+  const VISTAS = ['todo', 'pendientes', 'graficos', 'respuesta', 'materias', 'registro'];
+  let rot = null;
+  function setVista(v, silencio) {
+    state.view = v; const mostrar = v === 'presentacion' ? VISTAS[1] : v;
+    $$('[data-views]').forEach((s) => { s.hidden = !s.dataset.views.split(' ').includes(mostrar); });
+    $$('#menu-ver [data-view]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.view === v)));
+    $('#ver-actual').textContent = $(`#menu-ver [data-view="${v}"]`).textContent.replace(/ \(.*\)/, '');
+    clearInterval(rot);
+    if (v === 'presentacion') {
+      let i = 1;
+      rot = setInterval(() => { i = (i % (VISTAS.length - 1)) + 1; $$('[data-views]').forEach((s) => { s.hidden = !s.dataset.views.split(' ').includes(VISTAS[i]); }); render(); play('vista'); }, ROTACION_MS);
+    }
+    render(); if (!silencio) play('vista'); scrollTo({ top: 0, behavior: motion ? 'smooth' : 'auto' });
+  }
+  $$('#menu-ver [data-view]').forEach((b) => b.addEventListener('click', () => { menu.hidden = true; setVista(b.dataset.view); }));
+  ['#q', '#f-em', '#f-pr'].forEach((s) => $(s).addEventListener('input', drawRegistro));
+  $$('#t-reg-tab th[data-sort] button').forEach((b) => b.addEventListener('click', () => {
+    const k = b.closest('th').dataset.sort; play('click');
+    if (k === state.sortKey) state.sortDir = -state.sortDir; else { state.sortKey = k; state.sortDir = 1; }
+    drawRegistro();
+  }));
+  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (state.folios.length) { drawMes(); drawPrio(); const { respuestas, kpi } = calcular(); drawResp(respuestas, kpi.med_resp_if); } }, 200); });
+
+  actualizar('inicio');
+})();

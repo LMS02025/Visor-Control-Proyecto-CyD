@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visor Control Proyecto CyD · Libro de Obra Digital</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div>
+        <h1>Visor Control Proyecto CyD</h1>
+        <p class="sub">Libro de Obra Digital · Construcción — Concesión Planta Desaladora para la Región de Coquimbo (D.S. de Adjudicación N° 15/2026)</p>
+      </div>
+    </div>
+    <nav class="toolbar" aria-label="Controles">
+      <div class="menu">
+        <button class="btn" id="btn-ver" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1.5 12S5.5 4.5 12 4.5 22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3.2"/></svg>
+          Visualizar <span class="cur" id="ver-actual">Todo</span>
+        </button>
+        <div class="menu-list" id="menu-ver" role="menu" hidden>
+          <button role="menuitemradio" data-view="todo" aria-checked="true">Todo el panel</button>
+          <button role="menuitemradio" data-view="pendientes" aria-checked="false">Acciones pendientes</button>
+          <button role="menuitemradio" data-view="graficos" aria-checked="false">Gráficos de flujo</button>
+          <button role="menuitemradio" data-view="respuesta" aria-checked="false">Tiempo de respuesta IF</button>
+          <button role="menuitemradio" data-view="materias" aria-checked="false">Estado de materias</button>
+          <button role="menuitemradio" data-view="registro" aria-checked="false">Registro de folios</button>
+          <button role="menuitemradio" data-view="presentacion" aria-checked="false">Modo presentación (rotativo)</button>
+        </div>
+      </div>
+      <button class="btn primary" id="btn-act">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>
+        Actualizar
+      </button>
+      <button class="btn icon" id="btn-son" aria-pressed="true" title="Sonido activado">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path class="on" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l5 6M21 9l-5 6"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <div class="refresh" aria-live="polite">
+    <div class="bar"><div class="fill" id="bar-fill"></div></div>
+    <div class="refresh-txt"><span id="estado-sync">Cargando datos…</span><span id="cuenta">—</span></div>
+  </div>
+
+  <main id="vistas">
+    <section class="takeaway card-in" data-views="todo pendientes">
+      <p>El libro registra <b data-k="total">—</b> folios al <b data-k="ultima">—</b>. <b class="warn" data-k="pend_if">—</b> materias esperan pronunciamiento de la Inspección Fiscal y <b class="bad" data-k="pend_sc">—</b> esperan respuesta de la Sociedad Concesionaria.</p>
+    </section>
+
+    <section class="tiles" data-views="todo pendientes graficos">
+      <div class="tile"><div class="lbl">Folios registrados</div><div class="val" data-k="total">—</div><div class="note">Desde el <span data-k="primera">—</span></div></div>
+      <div class="tile"><div class="lbl">Emitidos por la SC</div><div class="val" data-k="sc">—</div><div class="note">Soc. Concesionaria Desaladora de Panul S.A.</div></div>
+      <div class="tile"><div class="lbl">Emitidos por la IF</div><div class="val" data-k="if_">—</div><div class="note">Inspección Fiscal (titular y subrogante)</div></div>
+      <div class="tile warn"><div class="lbl">Pendientes de la IF</div><div class="val" data-k="pend_if">—</div><div class="note">Presentaciones sin pronunciamiento</div></div>
+      <div class="tile bad"><div class="lbl">Pendientes de la SC</div><div class="val" data-k="pend_sc">—</div><div class="note">Observaciones por subsanar</div></div>
+      <div class="tile"><div class="lbl">Respuesta IF (mediana)</div><div class="val"><span data-k="med_resp_if">—</span><small> días</small></div><div class="note">SC: <span data-k="med_resp_sc">—</span> días de mediana</div></div>
+    </section>
+
+    <section class="card" id="pendientes" data-views="todo pendientes">
+      <h2>Materias con acción pendiente</h2>
+      <p class="hint">Materias cuyo último folio deja la gestión en manos de una de las partes, ordenadas por días corridos desde el último movimiento.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Materia</th><th>Artículo BALI</th><th>Debe responder</th><th>Estado</th><th class="num">Último folio</th><th class="num">Días</th><th>Situación</th></tr></thead>
+        <tbody id="t-pend"></tbody>
+      </table></div>
+    </section>
+
+    <div class="grid2" data-views="todo graficos">
+      <section class="card">
+        <h2>Folios por mes</h2>
+        <p class="hint">Folios ingresados cada mes, por emisor.</p>
+        <div class="legend"><span><i class="sc"></i>Sociedad Concesionaria</span><span><i class="if"></i>Inspección Fiscal</span></div>
+        <div class="chart" id="c-mes"></div>
+      </section>
+      <section class="card">
+        <h2>Folios por prioridad</h2>
+        <p class="hint">Prioridad asignada por el emisor.</p>
+        <div class="legend"><span><i class="sc"></i>Sociedad Concesionaria</span><span><i class="if"></i>Inspección Fiscal</span></div>
+        <div class="chart" id="c-prio"></div>
+      </section>
+    </div>
+
+    <section class="card" id="respuesta" data-views="todo respuesta graficos">
+      <h2>Tiempo de respuesta de la Inspección Fiscal</h2>
+      <p class="hint">Días entre cada presentación de la SC y el folio de la IF que la responde. La línea marca la mediana; en color, las respuestas que la superan.</p>
+      <div class="chart" id="c-resp"></div>
+    </section>
+
+    <section class="card" id="materias" data-views="todo materias">
+      <h2>Estado de todas las materias</h2>
+      <p class="hint">Agrupación de los folios por materia contractual y estado según el último pronunciamiento registrado.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Materia</th><th>Artículo BALI</th><th>Estado</th><th>Folios</th><th>Último movimiento</th><th>Situación</th></tr></thead>
+        <tbody id="t-mat"></tbody>
+      </table></div>
+    </section>
+
+    <section class="card" id="registro" data-views="todo registro">
+      <h2>Registro de folios</h2>
+      <p class="hint">Cada folio con enlace a su PDF firmado. Busque por asunto, materia, persona o número; pulse un encabezado para ordenar.</p>
+      <div class="tools">
+        <input type="search" id="q" placeholder="Buscar en folios…" aria-label="Buscar en folios">
+        <select id="f-em" aria-label="Emisor"><option value="">Todos los emisores</option><option value="SC">Sociedad Concesionaria</option><option value="IF">Inspección Fiscal</option></select>
+        <select id="f-pr" aria-label="Prioridad"><option value="">Todas las prioridades</option><option>Alta</option><option>Media</option><option>Baja</option></select>
+      </div>
+      <div class="tablewrap tall"><table id="t-reg-tab">
+        <thead><tr>
+          <th class="num" data-sort="folio"><button>N°</button></th><th data-sort="fecha"><button>Fecha</button></th><th data-sort="emisor"><button>Emisor</button></th><th data-sort="por"><button>Por</button></th><th data-sort="tipo"><button>Tipo</button></th><th data-sort="prioridad"><button>Prioridad</button></th><th data-sort="materia"><button>Materia</button></th><th data-sort="asunto"><button>Asunto</button></th><th>Referencias</th><th class="num" data-sort="adjuntos"><button>Adj.</button></th><th>PDF</th>
+        </tr></thead>
+        <tbody id="t-reg"></tbody>
+      </table></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    Fuente: carpeta A_LIBRO_CONSTRUCCION en Google Drive (PDF del Sistema de Gestión de Contratos), sincronizada con este repositorio. La materia y el estado de cada folio se asignaron por lectura del asunto, sus referencias y el pronunciamiento; los folios nuevos heredan la materia del folio que citan y quedan marcados para revisión. Plazos en días corridos.
+  </footer>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+<div class="tip" id="tip" hidden></div>
+<script src="vendor/d3.min.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

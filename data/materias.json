@@ -1,0 +1,227 @@
+[
+ {
+  "materia_id": "M01",
+  "materia": "Libro de Obra Digital",
+  "articulo": "—",
+  "folios": "1;2",
+  "estado": "Informativo",
+  "responde": "—",
+  "situacion": "Inicio formal del LOD de construcción; la SC acusa recibo (F2)."
+ },
+ {
+  "materia_id": "M02",
+  "materia": "Constitución y capital de la Sociedad Concesionaria",
+  "articulo": "Arts. 1.6.2 / 1.15.5.2",
+  "folios": "4;5;6;9;11;55;75",
+  "estado": "Cerrado",
+  "responde": "—",
+  "situacion": "IF acredita inscripción en el Registro de Entidades Informantes de la CMF, N° 742 (F75)."
+ },
+ {
+  "materia_id": "M03",
+  "materia": "Garantía de seriedad de la oferta",
+  "articulo": "Art. 1.4.5",
+  "folios": "3;34",
+  "estado": "Informativo",
+  "responde": "—",
+  "situacion": "Prórroga de boleta de garantía remitida (F34)."
+ },
+ {
+  "materia_id": "M04",
+  "materia": "Garantía de construcción",
+  "articulo": "Art. 1.7.5.4.1.1",
+  "folios": "15;19;22;26;32;43;69",
+  "estado": "Aprobado",
+  "responde": "—",
+  "situacion": "Póliza Chubb N° 6009748 con Endosos 1 y 2 aprobada; vigencia hasta 30/06/2030 (F69)."
+ },
+ {
+  "materia_id": "M05",
+  "materia": "Entrega de terrenos",
+  "articulo": "Art. 1.8.1.3",
+  "folios": "7;30",
+  "estado": "Cerrado",
+  "responde": "—",
+  "situacion": "Entrega formal de 8 lotes expropiados con actas de Toma de Posesión Material (F30)."
+ },
+ {
+  "materia_id": "M06",
+  "materia": "Gerente General y Gerente Técnico",
+  "articulo": "Art. 1.7.11",
+  "folios": "10",
+  "estado": "Sin pronunciamiento",
+  "responde": "IF",
+  "situacion": "Antecedentes presentados el 04/06/2026; no consta respuesta de la IF en el libro."
+ },
+ {
+  "materia_id": "M07",
+  "materia": "Equipo profesional, fase de ingeniería",
+  "articulo": "Art. 1.7.11",
+  "folios": "31;82;83;84;85",
+  "estado": "En revisión",
+  "responde": "IF",
+  "situacion": "Aprobación provisional del Resp. de Procesos y Equipos Mecánicos (F84); la SC informa 7 nombramientos (F85). Regularización de títulos extranjeros ante MINEDUC: plazo de 6 meses desde F82."
+ },
+ {
+  "materia_id": "M08",
+  "materia": "Programa de Ejecución del Proyecto de Ingeniería Definitiva (PEPID)",
+  "articulo": "Art. 1.10.1.2",
+  "folios": "13;25;36;49;53;58",
+  "estado": "Aprobado",
+  "responde": "—",
+  "situacion": "PEPID Rev. C aprobado, con observaciones DOH subsanadas (F58)."
+ },
+ {
+  "materia_id": "M09",
+  "materia": "Ingeniería de detalle Fase 1 Rev. A: criterios y bases de diseño",
+  "articulo": "Art. 1.10.1.2",
+  "folios": "67;68",
+  "estado": "En revisión",
+  "responde": "IF",
+  "situacion": "Entregados USCI 4 (F67) y USCIs 1-2-3-6-7 (F68); sin pronunciamiento registrado."
+ },
+ {
+  "materia_id": "M10",
+  "materia": "Gestor BIM",
+  "articulo": "Art. 1.10.1.4.1",
+  "folios": "14;17;18",
+  "estado": "Aprobado",
+  "responde": "—",
+  "situacion": "IF aprueba al Gestor BIM propuesto (F17); se pidió aclarar discrepancia de RUT en certificados."
+ },
+ {
+  "materia_id": "M11",
+  "materia": "Plan de Ejecución BIM (PEB)",
+  "articulo": "Art. 1.10.1.4.4",
+  "folios": "24;33;41;52;66;80",
+  "estado": "Observado",
+  "responde": "SC",
+  "situacion": "Rev. C mantiene 3 observaciones pendientes de subsanación (F80)."
+ },
+ {
+  "materia_id": "M12",
+  "materia": "Revisor Estructural Independiente",
+  "articulo": "Art. 1.10.1.3",
+  "folios": "35;40;47;54",
+  "estado": "Aprobado",
+  "responde": "—",
+  "situacion": "IF tiene por acreditada la experiencia mínima de 5 años exigida (F54)."
+ },
+ {
+  "materia_id": "M13",
+  "materia": "Programa de Gestión de Huella de Carbono",
+  "articulo": "Arts. 1.9.1.5.1 / 2.7.4.2",
+  "folios": "8;21;23;42;50;65",
+  "estado": "Aprobado con condiciones",
+  "responde": "—",
+  "situacion": "Rev. B aprobada en forma condicionada; materias pendientes a actualizar con el PID y la RCA (F65)."
+ },
+ {
+  "materia_id": "M14",
+  "materia": "Programa de Gestión Sustentable (PGS)",
+  "articulo": "Art. 1.9.1.3",
+  "folios": "48;61;70",
+  "estado": "Observado",
+  "responde": "SC",
+  "situacion": "Rev. A no aprobada; observaciones contenidas en minutas adjuntas (F70)."
+ },
+ {
+  "materia_id": "M15",
+  "materia": "Equipo de profesionales del PGS",
+  "articulo": "Art. 1.9.1.3.1 v)",
+  "folios": "60;78;88",
+  "estado": "En revisión",
+  "responde": "IF",
+  "situacion": "Jefe PGS cumple; Coordinador Territorial observado (F78). SC solicita reconsideración (F88)."
+ },
+ {
+  "materia_id": "M16",
+  "materia": "Subcontratación",
+  "articulo": "Art. 1.7.10",
+  "folios": "27;38;59;73;74",
+  "estado": "Aprobado",
+  "responde": "—",
+  "situacion": "IF aprueba subcontratación de Sacyr Asesorías y Diseños SpA (F59); SC remite contratos (F73, F74)."
+ },
+ {
+  "materia_id": "M17",
+  "materia": "Modificación de oferta técnica: captación y descarga marítimas",
+  "articulo": "Art. 1.9.1.2.1",
+  "folios": "28;64",
+  "estado": "Observado",
+  "responde": "SC",
+  "situacion": "IF exige respuesta fundada y acreditar compatibilidad con el EIA en tramitación (F64)."
+ },
+ {
+  "materia_id": "M18",
+  "materia": "Plan de Trabajo de Topografía",
+  "articulo": "Art. 2.2.2.2.1",
+  "folios": "44;62;77;87",
+  "estado": "Aprobado",
+  "responde": "—",
+  "situacion": "Rev. B aprobada; se solicita fundamentar desequilibrio acumulado máx. 1 m y coordinar con comunidades (F87)."
+ },
+ {
+  "materia_id": "M19",
+  "materia": "Plan de Exploración Geotécnica Terrestre",
+  "articulo": "Art. 2.2.2.2.3",
+  "folios": "45;63;79",
+  "estado": "En revisión",
+  "responde": "IF",
+  "situacion": "Plan corregido entregado el 22/10/2026 (F79)."
+ },
+ {
+  "materia_id": "M20",
+  "materia": "Campaña de sondajes marinos",
+  "articulo": "Art. 2.2.2.2.4",
+  "folios": "76",
+  "estado": "Informativo",
+  "responde": "—",
+  "situacion": "Inicio estimado 29/10/2026, sujeto a autorización de Capitanía de Puerto; equipo naval hasta diciembre."
+ },
+ {
+  "materia_id": "M21",
+  "materia": "Puntos de entrega de agua en sector Panul",
+  "articulo": "Art. 2.2.2.4.2",
+  "folios": "86",
+  "estado": "En revisión",
+  "responde": "IF",
+  "situacion": "Solicita aprobar 2 puntos de entrega con caudal mínimo de 10 l/s (prioridad alta)."
+ },
+ {
+  "materia_id": "M22",
+  "materia": "Peritos tasadores",
+  "articulo": "Art. 1.10.2.1.3",
+  "folios": "37;56;81",
+  "estado": "Observado",
+  "responde": "SC",
+  "situacion": "IF exige complementar antecedentes de los 6 peritos propuestos (F81)."
+ },
+ {
+  "materia_id": "M23",
+  "materia": "Información periódica y estados financieros",
+  "articulo": "Art. 1.15.5.3",
+  "folios": "29;39;51;57;71",
+  "estado": "Informativo",
+  "responde": "—",
+  "situacion": "Reportes mensuales hasta septiembre de 2026 y EE.FF. al 30/06/2026."
+ },
+ {
+  "materia_id": "M24",
+  "materia": "Pagos y aspectos tributarios",
+  "articulo": "Arts. 1.12.1.1 / 1.12.4 / 1.12.6",
+  "folios": "16;46;72",
+  "estado": "Informativo",
+  "responde": "—",
+  "situacion": "Primer pago adm. y control UF 30.000 (F16); base IVA abr–jul (F46); relación de pagos 2027 (F72)."
+ },
+ {
+  "materia_id": "M25",
+  "materia": "Oficina provisoria y empleo local",
+  "articulo": "Arts. 1.10.2.2 / 2.3.2 / 1.7.2",
+  "folios": "12;20",
+  "estado": "Informativo",
+  "responde": "—",
+  "situacion": "Acta de entrega de oficina provisoria (F20); primera publicación de ofertas en BNE (F12)."
+ }
+]
