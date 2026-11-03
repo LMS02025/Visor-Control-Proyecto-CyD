@@ -142,7 +142,7 @@
     svg.append('g').selectAll('text').data(meses).join('text').attr('x', (m) => x(m) + x.bandwidth() / 2).attr('y', H - 8).attr('text-anchor', 'middle').text(fmtMes);
     const bw = Math.min(34, x.bandwidth()), bx = (d) => x(d.mes) + (x.bandwidth() - bw) / 2;
     const g = svg.append('g').selectAll('g').data(data).join('g');
-    const gSC = grad(svg, 'gm-sc', css('--sapphire2'), css('--sapphire'), true), gIF = grad(svg, 'gm-if', css('--amber2'), css('--amber'), true);
+    const gSC = css('--sapphire'), gIF = css('--amber');
     g.append('rect').attr('x', bx).attr('width', bw).attr('rx', 4).attr('fill', gSC).attr('y', y(0)).attr('height', 0)
       .transition().duration(dur()).delay((d, i) => i * 70).attr('y', (d) => y(d.SC)).attr('height', (d) => y(0) - y(d.SC));
     g.append('rect').attr('x', bx).attr('width', bw).attr('rx', 4).attr('fill', gIF).attr('y', y(0)).attr('height', 0)
@@ -163,7 +163,7 @@
     const bh = Math.min(34, y.bandwidth()), by = (d) => y(d.p) + (y.bandwidth() - bh) / 2;
     const g = svg.append('g').selectAll('g').data(data).join('g');
     g.append('text').attr('x', mg.l - 8).attr('y', (d) => by(d) + bh / 2 + 4).attr('text-anchor', 'end').text((d) => d.p);
-    const pSC = grad(svg, 'gp-sc', css('--sapphire'), css('--sapphire2')), pIF = grad(svg, 'gp-if', css('--amber'), css('--amber2'));
+    const pSC = css('--sapphire'), pIF = css('--amber');
     g.append('rect').attr('x', mg.l).attr('y', by).attr('height', bh).attr('rx', 4).attr('fill', pSC).attr('width', 0)
       .transition().duration(dur()).delay((d, i) => i * 90).attr('width', (d) => x(d.SC) - mg.l);
     g.append('rect').attr('x', mg.l).attr('y', by).attr('height', bh).attr('rx', 4).attr('fill', pIF).attr('width', 0)
@@ -183,7 +183,7 @@
     svg.append('g').attr('class', 'grid').selectAll('line').data(x.ticks(6)).join('line').attr('x1', x).attr('x2', x).attr('y1', mg.t - 4).attr('y2', H - mg.b);
     svg.append('g').selectAll('text').data(x.ticks(6)).join('text').attr('x', x).attr('y', 12).attr('text-anchor', 'middle').text((v) => `${v} d`);
     const mx = d3.max(rows, (r) => r.dias) || 1, m0 = med || mx / 2;
-    const color = d3.scaleLinear([0, m0 * 0.6, m0, (m0 + mx) / 2, mx], [css('--teal'), css('--emerald'), css('--amber2'), css('--amber'), css('--ruby')]).interpolate(d3.interpolateRgb).clamp(true);
+    const color = (d) => (d <= m0 ? css('--emerald') : d <= 2 * m0 ? css('--amber') : css('--ruby'));
     const g = svg.append('g').selectAll('g').data(rows).join('g').attr('transform', (r, i) => `translate(0,${mg.t + i * (bh + gap)})`);
     g.append('text').attr('x', mg.l - 8).attr('y', bh - 4).attr('text-anchor', 'end').text((r) => `F${r.folio} ← F${r.ref}`);
     g.append('rect').attr('x', mg.l).attr('height', bh).attr('rx', 3).attr('width', 0)

@@ -163,3 +163,33 @@ td a { color: var(--gold2); text-decoration: none; font-weight: 600; border-bott
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } }
 @keyframes flash { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold) 55%, transparent); } 100% { box-shadow: 0 0 0 16px transparent; } }
 @keyframes rownew { 0%, 40% { background: color-mix(in srgb, var(--teal) 26%, transparent); } }
+
+/* ===== Colores sólidos (sustituye degradados y transparencias) ===== */
+body { background: var(--bg); }
+.brand h1 { background: none; color: var(--gold); -webkit-background-clip: initial; background-clip: initial; }
+.logo { background: var(--panel-solid); }
+.logo span:nth-child(1) { background: var(--sapphire); } .logo span:nth-child(2) { background: var(--gold); } .logo span:nth-child(3) { background: var(--emerald); }
+.btn { background: var(--panel-solid); backdrop-filter: none; }
+.btn.primary { background: var(--gold); box-shadow: none; }
+.fill { background: var(--gold); animation: none; }
+.takeaway, .card { background: var(--panel-solid); backdrop-filter: none; }
+.takeaway::before { background: var(--gold); width: 6px; }
+.tile { background: var(--c); border: 0; color: #fff; }
+.tile::after { display: none; }
+.tile .lbl, .tile .note, .tile .val small { color: #fff; opacity: .9; }
+.tile .val { color: #fff; }
+.card { border-top: 5px solid var(--c, var(--gold)); }
+#pendientes { --c: var(--ruby); } #materias { --c: var(--violet); } #registro { --c: var(--sapphire); } #respuesta { --c: var(--emerald); }
+.grid2 .card:nth-child(1) { --c: var(--teal); } .grid2 .card:nth-child(2) { --c: var(--amber); }
+.card h2::after { background: var(--c, var(--gold)); width: 56px; height: 3px; }
+th { background: var(--c, var(--gold)); color: #fff; border-bottom: 0; }
+.legend i.sc { background: var(--sapphire); } .legend i.if { background: var(--amber); }
+.badge { background: var(--c, var(--muted)); color: #fff; border: 0; }
+.st-if .badge, .badge.st-if, .badge.st-warn, .badge.d2 { color: #241600; }
+.dias.d1, .dias.d2, .dias.d3 { background: none; }
+.dias.d1 { background: var(--emerald); } .dias.d2 { background: var(--amber); color: #241600; } .dias.d3 { background: var(--ruby); }
+.minibar { background: var(--c, var(--sapphire)); }
+.chart .med { stroke: var(--fg); }
+.chart text.medtxt { fill: var(--fg); }
+.st-sc { --c: var(--sapphire); }
+.badge.st-if { color: #241600; }
