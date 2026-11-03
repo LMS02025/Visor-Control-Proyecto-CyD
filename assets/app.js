@@ -6,6 +6,12 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const grad = (svg, id, c1, c2, vertical) => {
+    let defs = svg.select('defs'); if (defs.empty()) defs = svg.append('defs');
+    const g = defs.append('linearGradient').attr('id', id).attr('x1', 0).attr('y1', 0).attr('x2', vertical ? 0 : 1).attr('y2', vertical ? 1 : 0);
+    g.append('stop').attr('offset', '0%').attr('stop-color', c1); g.append('stop').attr('offset', '100%').attr('stop-color', c2);
+    return `url(#${id})`;
+  };
   const motion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
   const state = { folios: [], materias: [], meta: {}, prevIds: null, nuevos: new Set(), sortKey: 'folio', sortDir: -1, view: 'todo', next: 0, loading: false };
 
@@ -102,9 +108,11 @@
     mat.filter((m) => m.responde === 'IF' || m.responde === 'SC').sort((a, b) => b.dias_desde - a.dias_desde).forEach((m, i) => {
       const tr = tb.insertRow(); if (motion) tr.style.animation = `rise .45s ${i * 0.04}s both`;
       cell(tr, m.materia); cell(tr, m.articulo, 'dim');
-      badge(cell(tr, ''), parte(m.responde), m.responde === 'IF' ? 'st-warn' : 'st-bad');
+      badge(cell(tr, ''), parte(m.responde), m.responde === 'IF' ? 'st-if' : 'st-sc');
       badge(cell(tr, ''), m.estado);
-      cell(tr, 'F' + m.ultimo_folio, 'num'); cell(tr, d3.format(',')(m.dias_desde), 'num'); cell(tr, m.situacion, 'wrap');
+      cell(tr, 'F' + m.ultimo_folio, 'num');
+      const cd = cell(tr, '', 'num'); const p = document.createElement('span'); p.className = 'dias ' + (m.dias_desde > 30 ? 'd3' : m.dias_desde > 14 ? 'd2' : 'd1'); p.textContent = d3.format(',')(m.dias_desde); cd.appendChild(p);
+      cell(tr, m.situacion, 'wrap');
     });
   }
 
@@ -114,7 +122,7 @@
     mat.forEach((m) => {
       const tr = tb.insertRow();
       cell(tr, m.materia); cell(tr, m.articulo, 'dim'); badge(cell(tr, ''), m.estado);
-      const c = cell(tr, ''); const b = document.createElement('span'); b.className = 'minibar'; b.style.width = '0'; c.append(b, String(m.n_folios));
+      const c = cell(tr, ''); const b = document.createElement('span'); b.className = 'minibar ' + estadoClase(m.estado); b.style.width = '0'; c.append(b, String(m.n_folios));
       requestAnimationFrame(() => { b.style.transition = motion ? 'width .8s cubic-bezier(.2,.8,.2,1)' : ''; b.style.width = (48 * m.n_folios / max) + 'px'; });
       cell(tr, `${fmtFecha(m.fecha_ultimo)} · F${m.ultimo_folio}`, 'dim'); cell(tr, m.situacion, 'wrap');
     });
@@ -134,11 +142,12 @@
     svg.append('g').selectAll('text').data(meses).join('text').attr('x', (m) => x(m) + x.bandwidth() / 2).attr('y', H - 8).attr('text-anchor', 'middle').text(fmtMes);
     const bw = Math.min(34, x.bandwidth()), bx = (d) => x(d.mes) + (x.bandwidth() - bw) / 2;
     const g = svg.append('g').selectAll('g').data(data).join('g');
-    g.append('rect').attr('x', bx).attr('width', bw).attr('rx', 3).attr('fill', css('--sc')).attr('y', y(0)).attr('height', 0)
+    const gSC = grad(svg, 'gm-sc', css('--sapphire2'), css('--sapphire'), true), gIF = grad(svg, 'gm-if', css('--amber2'), css('--amber'), true);
+    g.append('rect').attr('x', bx).attr('width', bw).attr('rx', 4).attr('fill', gSC).attr('y', y(0)).attr('height', 0)
       .transition().duration(dur()).delay((d, i) => i * 70).attr('y', (d) => y(d.SC)).attr('height', (d) => y(0) - y(d.SC));
-    g.append('rect').attr('x', bx).attr('width', bw).attr('rx', 3).attr('fill', css('--if')).attr('y', y(0)).attr('height', 0)
+    g.append('rect').attr('x', bx).attr('width', bw).attr('rx', 4).attr('fill', gIF).attr('y', y(0)).attr('height', 0)
       .transition().duration(dur()).delay((d, i) => 250 + i * 70).attr('y', (d) => y(d.SC + d.IF)).attr('height', (d) => y(d.SC) - y(d.SC + d.IF));
-    g.append('text').attr('x', (d) => bx(d) + bw / 2).attr('text-anchor', 'middle').attr('y', (d) => y(d.SC + d.IF) - 5).text((d) => d.SC + d.IF).attr('opacity', 0).transition().delay(dur() + 200).attr('opacity', 1);
+    g.append('text').attr('class', 'lab').attr('x', (d) => bx(d) + bw / 2).attr('text-anchor', 'middle').attr('y', (d) => y(d.SC + d.IF) - 5).text((d) => d.SC + d.IF).attr('opacity', 0).transition().delay(dur() + 200).attr('opacity', 1);
     g.append('rect').attr('x', (d) => x(d.mes)).attr('width', x.bandwidth()).attr('y', mg.t).attr('height', H - mg.t - mg.b).attr('fill', 'transparent')
       .on('pointermove', (ev, d) => showTip(ev, fmtMes(d.mes), [`Sociedad Concesionaria: ${d.SC}`, `Inspección Fiscal: ${d.IF}`, `Total: ${d.SC + d.IF}`])).on('pointerleave', hideTip);
   }
@@ -154,11 +163,12 @@
     const bh = Math.min(34, y.bandwidth()), by = (d) => y(d.p) + (y.bandwidth() - bh) / 2;
     const g = svg.append('g').selectAll('g').data(data).join('g');
     g.append('text').attr('x', mg.l - 8).attr('y', (d) => by(d) + bh / 2 + 4).attr('text-anchor', 'end').text((d) => d.p);
-    g.append('rect').attr('x', mg.l).attr('y', by).attr('height', bh).attr('rx', 3).attr('fill', css('--sc')).attr('width', 0)
+    const pSC = grad(svg, 'gp-sc', css('--sapphire'), css('--sapphire2')), pIF = grad(svg, 'gp-if', css('--amber'), css('--amber2'));
+    g.append('rect').attr('x', mg.l).attr('y', by).attr('height', bh).attr('rx', 4).attr('fill', pSC).attr('width', 0)
       .transition().duration(dur()).delay((d, i) => i * 90).attr('width', (d) => x(d.SC) - mg.l);
-    g.append('rect').attr('x', mg.l).attr('y', by).attr('height', bh).attr('rx', 3).attr('fill', css('--if')).attr('width', 0)
+    g.append('rect').attr('x', mg.l).attr('y', by).attr('height', bh).attr('rx', 4).attr('fill', pIF).attr('width', 0)
       .transition().duration(dur()).delay((d, i) => 250 + i * 90).attr('x', (d) => x(d.SC)).attr('width', (d) => x(d.SC + d.IF) - x(d.SC));
-    g.append('text').attr('x', (d) => x(d.SC + d.IF) + 6).attr('y', (d) => by(d) + bh / 2 + 4).text((d) => d.SC + d.IF).attr('opacity', 0).transition().delay(dur() + 200).attr('opacity', 1);
+    g.append('text').attr('class', 'lab').attr('x', (d) => x(d.SC + d.IF) + 6).attr('y', (d) => by(d) + bh / 2 + 4).text((d) => d.SC + d.IF).attr('opacity', 0).transition().delay(dur() + 200).attr('opacity', 1);
     g.append('rect').attr('x', mg.l).attr('y', (d) => y(d.p)).attr('height', y.bandwidth()).attr('width', W - mg.l - mg.r).attr('fill', 'transparent')
       .on('pointermove', (ev, d) => showTip(ev, `Prioridad ${d.p.toLowerCase()}`, [`Sociedad Concesionaria: ${d.SC}`, `Inspección Fiscal: ${d.IF}`])).on('pointerleave', hideTip);
   }
@@ -172,17 +182,19 @@
     const svg = d3.select(el).append('svg').attr('viewBox', `0 0 ${W} ${H}`);
     svg.append('g').attr('class', 'grid').selectAll('line').data(x.ticks(6)).join('line').attr('x1', x).attr('x2', x).attr('y1', mg.t - 4).attr('y2', H - mg.b);
     svg.append('g').selectAll('text').data(x.ticks(6)).join('text').attr('x', x).attr('y', 12).attr('text-anchor', 'middle').text((v) => `${v} d`);
+    const mx = d3.max(rows, (r) => r.dias) || 1, m0 = med || mx / 2;
+    const color = d3.scaleLinear([0, m0 * 0.6, m0, (m0 + mx) / 2, mx], [css('--teal'), css('--emerald'), css('--amber2'), css('--amber'), css('--ruby')]).interpolate(d3.interpolateRgb).clamp(true);
     const g = svg.append('g').selectAll('g').data(rows).join('g').attr('transform', (r, i) => `translate(0,${mg.t + i * (bh + gap)})`);
     g.append('text').attr('x', mg.l - 8).attr('y', bh - 4).attr('text-anchor', 'end').text((r) => `F${r.folio} ← F${r.ref}`);
     g.append('rect').attr('x', mg.l).attr('height', bh).attr('rx', 3).attr('width', 0)
-      .attr('fill', (r) => (med != null && r.dias > med ? css('--if') : css('--muted'))).attr('opacity', (r) => (med != null && r.dias > med ? 1 : 0.45))
+      .attr('fill', (r) => color(r.dias))
       .transition().duration(dur()).delay((r, i) => i * 30).attr('width', (r) => Math.max(1, x(r.dias) - mg.l));
     g.append('text').attr('x', (r) => x(r.dias) + 6).attr('y', bh - 4).text((r) => r.dias).attr('opacity', 0).transition().delay(dur() + rows.length * 30).attr('opacity', 1);
     g.append('rect').attr('width', W).attr('height', bh + gap).attr('y', -gap / 2).attr('fill', 'transparent')
       .on('pointermove', (ev, r) => showTip(ev, `Folio ${r.folio} · ${fmtFecha(r.fecha)}`, [r.materia, `Responde al folio ${r.ref} en ${r.dias} días`])).on('pointerleave', hideTip);
     if (med != null) {
       svg.append('line').attr('class', 'med').attr('x1', x(med)).attr('x2', x(med)).attr('y1', mg.t - 4).attr('y2', H - mg.b);
-      svg.append('text').attr('x', x(med) + 5).attr('y', H - mg.b - 2).style('fill', css('--fg')).text(`mediana ${med} d`);
+      svg.append('text').attr('class', 'medtxt').attr('x', x(med) + 6).attr('y', H - mg.b - 2).text(`mediana ${med} días`);
     }
   }
 
@@ -194,7 +206,7 @@
       .sort((a, b) => s * (num(k) ? +a[k] - +b[k] : String(a[k]).localeCompare(String(b[k]), 'es')))
       .forEach((f) => {
         const tr = tb.insertRow(); if (state.nuevos.has(+f.folio)) tr.className = 'row-new';
-        cell(tr, String(f.folio), 'num'); cell(tr, `${fmtFecha(f.fecha)} ${f.hora || ''}`, 'dim'); cell(tr, f.emisor); cell(tr, f.por); cell(tr, f.tipo); cell(tr, f.prioridad);
+        cell(tr, String(f.folio), 'num'); cell(tr, `${fmtFecha(f.fecha)} ${f.hora || ''}`, 'dim'); badge(cell(tr, ''), f.emisor, f.emisor === 'IF' ? 'st-if' : 'st-sc'); cell(tr, f.por); cell(tr, f.tipo); badge(cell(tr, ''), f.prioridad, ({ Alta: 'st-bad', Media: 'st-warn', Baja: 'st-ok' })[f.prioridad]);
         const cm = cell(tr, f.materia); if (f.revisar) { cm.append(' '); badge(cm, 'Por revisar'); }
         cell(tr, f.asunto, 'wrap'); cell(tr, f.refs ? f.refs.split(';').map((r) => 'F' + r).join(', ') : '', 'dim'); cell(tr, String(f.adjuntos ?? ''), 'num');
         const c = tr.insertCell(); const a = document.createElement('a'); a.href = f.enlace; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Abrir'; c.appendChild(a);
