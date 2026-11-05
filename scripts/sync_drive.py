@@ -123,6 +123,9 @@ def texto_pdf(svc, file_id):
     return "\n".join((p.extract_text() or "") for p in PdfReader(buf).pages)
 
 
+HEARTBEAT_H = 3
+
+
 def main():
     folios = json.loads((DATA / "folios.json").read_text(encoding="utf-8"))
     materias = json.loads((DATA / "materias.json").read_text(encoding="utf-8"))
@@ -152,11 +155,19 @@ def main():
     if nuevos:
         (DATA / "folios.json").write_text(json.dumps(folios, ensure_ascii=False, indent=1), encoding="utf-8")
         (DATA / "materias.json").write_text(json.dumps(materias, ensure_ascii=False, indent=1), encoding="utf-8")
-    meta = {"generado": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            "sincronizado": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            "carpeta_drive": CONFIG["carpeta_drive"], "folios": len(folios), "nuevos_ultima_sync": [r["folio"] for r in nuevos]}
-    # meta.json solo se reescribe cuando hay folios nuevos, para no generar un commit en cada ejecución.
-    if nuevos or not (DATA / "meta.json").exists():
+    ahora = datetime.now(timezone.utc)
+    previo = json.loads((DATA / "meta.json").read_text(encoding="utf-8")) if (DATA / "meta.json").exists() else {}
+    try:
+        horas = (ahora - datetime.fromisoformat(previo["sincronizado"])).total_seconds() / 3600
+    except (KeyError, TypeError, ValueError):
+        horas = float("inf")
+    # meta.json se reescribe con folios nuevos o, como testigo de funcionamiento, cada HEARTBEAT_H horas.
+    # Así el visor distingue "sin novedades" de "sincronización caída" sin generar un commit cada 30 minutos.
+    if nuevos or horas >= HEARTBEAT_H:
+        meta = {"generado": previo.get("generado") if not nuevos and previo.get("generado") else ahora.isoformat(timespec="seconds"),
+                "sincronizado": ahora.isoformat(timespec="seconds"),
+                "carpeta_drive": CONFIG["carpeta_drive"], "folios": len(folios),
+                "nuevos_ultima_sync": [r["folio"] for r in nuevos] if nuevos else previo.get("nuevos_ultima_sync", [])}
         (DATA / "meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"{len(nuevos)} folio(s) nuevo(s); total {len(folios)}")
 

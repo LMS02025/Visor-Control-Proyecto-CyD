@@ -41,6 +41,7 @@
   const fmtFecha = (iso) => { const [y, m, d] = String(iso).split('-'); return `${d}/${m}/${y}`; };
   const MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
   const fmtMes = (ym) => `${MES[+ym.slice(5, 7) - 1]} ${ym.slice(2, 4)}`;
+  const SYNC_MAX_H = 6; // horas sin sincronización antes de advertir desfase
   const hoyISO = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Santiago' });
   const diasEntre = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
   const estadoClase = (e) => ({ 'Aprobado': 'st-ok', 'Cerrado': 'st-ok', 'Aprobado con condiciones': 'st-ok', 'Observado': 'st-bad', 'En revisión': 'st-warn', 'Sin pronunciamiento': 'st-warn', 'Por revisar': 'st-new' })[e] || 'st-mut';
@@ -81,7 +82,7 @@
     const dias = (p) => respuestas.filter((r) => r.responde === p).map((r) => r.dias).sort((a, b) => a - b);
     const fechas = folios.map((f) => f.fecha).sort();
     const kpi = {
-      total: folios.length, primera: fechas[0], ultima: fechas[fechas.length - 1],
+      total: folios.length, primera: fechas[0], ultima: fechas[fechas.length - 1], corte,
       sc: folios.filter((f) => f.emisor === 'SC').length, if_: folios.filter((f) => f.emisor === 'IF').length,
       pend_if: mat.filter((m) => m.responde === 'IF').length, pend_sc: mat.filter((m) => m.responde === 'SC').length,
       med_resp_if: median(dias('IF')), med_resp_sc: median(dias('SC')),
@@ -233,8 +234,10 @@
       render();
       $$('.card, .tile, .takeaway').forEach((c) => { c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); });
       const hora = new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      const sync = meta.sincronizado ? ` · Drive sincronizado ${new Date(meta.sincronizado).toLocaleString('es-CL')}` : '';
-      $('#estado-sync').textContent = `Actualizado a las ${hora}${sync}`;
+      const est = $('#estado-sync'), horasSync = meta.sincronizado ? (Date.now() - Date.parse(meta.sincronizado)) / 36e5 : Infinity;
+      const sync = meta.sincronizado ? ` · Drive sincronizado ${new Date(meta.sincronizado).toLocaleString('es-CL', { timeZone: 'America/Santiago' })}` : ' · Sincronización con Drive no ejecutada';
+      est.textContent = `Actualizado a las ${hora}${sync}${horasSync > SYNC_MAX_H ? ' · ATENCIÓN: registro posiblemente desfasado respecto del Libro de Obra' : ''}`;
+      est.classList.toggle('desfase', horasSync > SYNC_MAX_H);
       if (state.nuevos.size) { toast(`${state.nuevos.size} folio(s) nuevo(s): ${[...state.nuevos].map((n) => 'F' + n).join(', ')}`); play('nuevo'); }
       else if (origen !== 'inicio') { toast('Contenido actualizado · sin folios nuevos'); play('ok'); }
     } catch (e) {

@@ -26,7 +26,7 @@ jobs:
         env:
           GDRIVE_SA_KEY: ${{ secrets.GDRIVE_SA_KEY }}
         run: |
-          if [ -z "$GDRIVE_SA_KEY" ]; then echo "::error::Falta el secret GDRIVE_SA_KEY"; exit 1; fi
+          if [ -z "$GDRIVE_SA_KEY" ]; then echo "::error::Falta el secret GDRIVE_SA_KEY (Settings → Secrets and variables → Actions). Sin él no se leen folios nuevos y el visor queda desfasado."; exit 1; fi
           python scripts/sync_drive.py
       - name: Publicar cambios
         run: |
@@ -34,5 +34,6 @@ jobs:
           git config user.name "drive-sync[bot]"
           git config user.email "drive-sync@users.noreply.github.com"
           git add data
-          git commit -m "Sincroniza folios nuevos del Libro de Obra Digital"
+          if git diff --quiet -- data/folios.json; then MSG="Testigo de sincronización con Drive (sin folios nuevos)"; else MSG="Sincroniza folios nuevos del Libro de Obra Digital"; fi
+          git commit -m "$MSG"
           git push

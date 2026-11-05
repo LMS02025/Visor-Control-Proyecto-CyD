@@ -80,6 +80,7 @@ body {
 .fill::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent); animation: shine 2.4s linear infinite; }
 @keyframes hue { to { background-position: 200% 0; } }
 @keyframes shine { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+#estado-sync.desfase { color: var(--ruby); font-weight: 600; }
 .refresh-txt { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; letter-spacing: .2px; }
 #cuenta { color: var(--gold); }
 
