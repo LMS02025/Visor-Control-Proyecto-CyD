@@ -1,8 +1,10 @@
 name: Sincronizar Libro de Obra desde Drive
 
 on:
-  schedule:
-    - cron: "*/30 * * * *"   # cada 30 minutos (GitHub puede demorar las ejecuciones programadas)
+  # Programación desactivada: la carga automática la realiza la tarea programada de Claude
+  # (scripts/cargar_folios.py). Reactivar solo si se configura el secret GDRIVE_SA_KEY con acceso a la carpeta.
+  # schedule:
+  #   - cron: "*/30 * * * *"
   workflow_dispatch: {}       # ejecución manual desde la pestaña Actions
 
 permissions:

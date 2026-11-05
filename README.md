@@ -36,10 +36,12 @@ El visor queda disponible en `https://<usuario>.github.io/Visor-Control-Proyecto
 
 ## Sincronización automática con Google Drive
 
-1. Comparta la carpeta `A_LIBRO_CONSTRUCCION` (Lector) con la cuenta de servicio, por ejemplo `github-drive-sync@…iam.gserviceaccount.com`.
-2. En Google Cloud, genere una clave JSON para esa cuenta de servicio.
-3. En el repositorio: *Settings → Secrets and variables → Actions → New repository secret*. Nombre `GDRIVE_SA_KEY`, valor: el contenido completo de la clave JSON.
-4. El flujo **Sincronizar Libro de Obra desde Drive** se ejecuta cada 30 minutos y también puede lanzarse a mano desde *Actions*. Cuando encuentra folios nuevos, los agrega a `data/` y hace un commit. GitHub Pages republica el sitio y el visor los muestra en su siguiente ciclo de 5 minutos.
+**Método vigente: tarea programada de Claude, cada 2 horas.** La tarea lee la carpeta `A_LIBRO_CONSTRUCCION` con el conector de Google Drive y detecta las carpetas `FOLIO N` posteriores al último folio cargado. Lee cada `folio-N.pdf`, clasifica el folio por materia y artículo según su contenido y fija el estado de la materia según el pronunciamiento. Luego carga el lote con `scripts/cargar_folios.py`, verifica el visor y publica en `main`; Vercel republica el sitio.
+
+- Cuando no hay folios nuevos, se registra un testigo en `data/meta.json` cada 3 h o más, en la primera ejecución que cumpla ese plazo. El visor advierte en rojo si el testigo supera 6 h; esa advertencia indica que la tarea dejó de ejecutarse.
+- Los folios cuya clasificación sea dudosa quedan marcados *Por revisar*.
+
+**Método alternativo (inactivo): GitHub Actions + cuenta de servicio.** El flujo `sync-drive.yml` (`scripts/sync_drive.py`) solo puede ejecutarse a mano. Para reactivarlo, la cuenta dueña de la carpeta debe compartirla con una cuenta de servicio, la clave JSON debe cargarse en el secret `GDRIVE_SA_KEY` y la línea `schedule` debe descomentarse.
 
 ### Criterio de clasificación de folios nuevos
 
