@@ -192,10 +192,10 @@
   "materia_id": "M22",
   "materia": "Peritos tasadores",
   "articulo": "Art. 1.10.2.1.3",
-  "folios": "37;56;81",
-  "estado": "Observado",
-  "responde": "SC",
-  "situacion": "IF exige complementar antecedentes de los 6 peritos propuestos (F81)."
+  "folios": "37;56;81;95",
+  "estado": "En revisión",
+  "responde": "IF",
+  "situacion": "SC reingresa antecedentes complementarios de los 6 peritos propuestos y circunscribe su función al cálculo del estado de avance; pendiente pronunciamiento IF (F95)."
  },
  {
   "materia_id": "M23",

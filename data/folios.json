@@ -1502,5 +1502,21 @@
   "refs": "70",
   "adjuntos": 13,
   "enlace": "https://drive.google.com/file/d/12mMwRuZx12Ds19qn_jLxetQGVHUY4nNA/view"
+ },
+ {
+  "folio": 95,
+  "fecha": "2026-11-06",
+  "hora": "10:47",
+  "emisor": "SC",
+  "por": "Angel Achau",
+  "para": "Lorena Araya",
+  "tipo": "Entrega Información",
+  "prioridad": "Media",
+  "materia_id": "M22",
+  "materia": "Peritos tasadores",
+  "asunto": "Envía Presentación de Propuesta de Peritos Tasadores Corregida - Art. 1.10.2.1.3",
+  "refs": "81",
+  "adjuntos": 6,
+  "enlace": "https://drive.google.com/file/d/1HhLLTdObuUpu5r8Go9azlFfRocs9REmb/view"
  }
 ]
