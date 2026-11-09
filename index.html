@@ -26,7 +26,6 @@
         <div class="menu-list" id="menu-ver" role="menu" hidden>
           <button role="menuitemradio" data-view="todo" aria-checked="true">Todo el panel</button>
           <button role="menuitemradio" data-view="pendientes" aria-checked="false">Acciones pendientes</button>
-          <button role="menuitemradio" data-view="respuesta" aria-checked="false">Tiempo de respuesta IF</button>
           <button role="menuitemradio" data-view="materias" aria-checked="false">Estado de materias</button>
           <button role="menuitemradio" data-view="registro" aria-checked="false">Registro de folios</button>
           <button role="menuitemradio" data-view="presentacion" aria-checked="false">Modo presentación (rotativo)</button>
@@ -72,12 +71,6 @@
         <thead><tr><th>Materia</th><th>Artículo BALI</th><th>Debe responder</th><th>Estado</th><th class="num">Último folio</th><th class="num">Días</th><th>Situación</th></tr></thead>
         <tbody id="t-pend"></tbody>
       </table></div>
-    </section>
-
-    <section class="card" id="respuesta" data-views="todo respuesta">
-      <h2>Tiempo de respuesta de la Inspección Fiscal</h2>
-      <p class="hint">Días entre cada presentación de la SC y el folio de la IF que la responde. Verde: hasta la mediana; ámbar: hasta el doble de la mediana; rojo: sobre el doble. La línea marca la mediana.</p>
-      <div class="chart" id="c-resp"></div>
     </section>
 
     <section class="card" id="materias" data-views="todo materias">

@@ -172,7 +172,38 @@ header,.tools,#list,#detail,.kpi{background:var(--glass)}
 .kpi+.kpi{border-left:1px solid var(--line)}
 button.kpi:hover,.kpi.on{background:color-mix(in srgb,var(--accent-soft) 80%,transparent)}
 @media (max-width:1040px){#detail{background:var(--panel)}}
-@media (prefers-reduced-motion:reduce){.fondo i{transition:none}}
+/* Efectos visuales */
+.fondo i{animation:kb 42s ease-in-out infinite alternate;will-change:transform}
+@keyframes kb{from{transform:scale(1) translate3d(0,0,0)}to{transform:scale(1.1) translate3d(-1.5%,-1%,0)}}
+#prog{position:absolute;left:0;right:0;bottom:-1px;height:3px;opacity:0;transition:opacity .3s;overflow:hidden}
+#prog.on{opacity:1}
+#prog i{display:block;height:100%;width:0;transition:width .4s ease;background:linear-gradient(90deg,var(--accent),var(--ok),var(--accent));background-size:200% 100%;animation:flujo 1.3s linear infinite}
+@keyframes flujo{to{background-position:-200% 0}}
+.btn,.chip,.seg button,.card,.tn,.kpi{transition:transform .16s ease,box-shadow .16s ease,background-color .16s ease,border-color .16s ease,color .16s ease}
+.btn:not(:disabled):hover,.chip:hover{transform:translateY(-1px);box-shadow:0 4px 12px color-mix(in srgb,var(--accent) 24%,transparent)}
+.btn:not(:disabled):active,.chip:active,.seg button:active{transform:scale(.95)}
+.tn:hover{transform:translateX(3px)}
+.kpi:hover{box-shadow:inset 0 -2px var(--accent)}
+.search input{transition:box-shadow .2s,border-color .2s}
+.search input:focus{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent)}
+tr.row{transition:background-color .15s,box-shadow .15s}
+tr.row:hover{box-shadow:inset 3px 0 var(--accent)}
+tr.row.sel{box-shadow:inset 3px 0 var(--accent)}
+.ty{transition:transform .16s}
+tr.row:hover .ty,.card:hover .ty{transform:scale(1.12)}
+.card:hover{transform:translateY(-3px);box-shadow:0 10px 22px color-mix(in srgb,var(--ink) 18%,transparent)}
+.in{animation:entra .34s cubic-bezier(.2,.7,.3,1) both;animation-delay:calc(var(--i)*16ms)}
+@keyframes entra{from{opacity:0;transform:translateY(9px)}}
+.dbody{animation:ficha .28s cubic-bezier(.2,.7,.3,1) both}
+@keyframes ficha{from{opacity:0;transform:translateX(26px)}}
+.pulse b{animation:pulso .7s ease}
+@keyframes pulso{40%{transform:scale(1.14);color:var(--accent)}}
+.kpi b{transform-origin:left center}
+.nav button{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 12px;font-weight:500}
+.nav button:disabled{opacity:.4;cursor:default}
+.nav button:not(:disabled):hover{color:var(--accent);background:var(--accent-soft)}
+.nav button+button{border-left:1px solid var(--line)}
+@media (prefers-reduced-motion:reduce){.fondo i,#prog i,.in,.dbody,.pulse b{animation:none}.fondo i{transition:none}.btn,.chip,.seg button,.card,.tn,.kpi,.ty,tr.row{transition:none;transform:none!important}}
 </style>
 </head>
 <body>
@@ -184,6 +215,7 @@ button.kpi:hover,.kpi.on{background:color-mix(in srgb,var(--accent-soft) 80%,tra
   </div>
   <span id="status" class="status"><span class="dot"></span><span id="statusT">Iniciando</span></span>
   <button id="refresh" class="btn" type="button">Actualizar índice</button>
+  <div id="prog" aria-hidden="true"><i></i></div>
 </header>
 
 <section class="kpis" id="kpis" aria-label="Resumen del repositorio"></section>
@@ -195,6 +227,9 @@ button.kpi:hover,.kpi.on{background:color-mix(in srgb,var(--accent-soft) 80%,tra
     <div class="tools">
       <div class="r">
         <button id="menuTree" class="btn" type="button">Carpetas</button>
+        <div class="seg nav" role="group" aria-label="Historial de consulta">
+          <button id="navB" type="button" disabled title="Volver a la consulta anterior (Alt + ←)">← Volver</button><button id="navF" type="button" disabled title="Avanzar a la consulta siguiente (Alt + →)">Avanzar →</button>
+        </div>
         <div class="search">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="4.6"/><path d="M10.5 10.5 14 14"/></svg>
           <input id="q" type="search" autocomplete="off" placeholder="Buscar por nombre o ruta: folio 67, PEPID, USCI 4, .xlsx" aria-label="Buscar por nombre o ruta">
@@ -316,13 +351,14 @@ async function listFolder(id,seen,enqueue){
   }while(token&&++guard<300);
 }
 let done=0,total=1,lastTry=0;
+function prog(x){const p=$("prog");p.classList.toggle("on",x>=0);if(x>=0)p.firstChild.style.width=Math.max(2,x*100)+"%"}
 async function crawl(){
   if(crawling||!mcp)return;
-  crawling=true; lastTry=Date.now(); failed=[]; done=0; total=1; banner("");
+  crawling=true; prog(.02); lastTry=Date.now(); failed=[]; done=0; total=1; banner("");
   setStatus("busy","Indexando carpetas"); $("refresh").disabled=true;
   const seen=new Set(), q=[]; let active=0, fatal=null, last=0;
   const enqueue=id=>{q.push(id);total++};
-  const tick=()=>{const n=Date.now();setStatus("busy","Indexando "+fmtN(done)+" de "+fmtN(total)+" carpetas");if(n-last>700){last=n;rebuild();render()}};
+  const tick=()=>{const n=Date.now();prog(done/total);setStatus("busy","Indexando "+fmtN(done)+" de "+fmtN(total)+" carpetas");if(n-last>700){last=n;rebuild();render()}};
   const one=async id=>{
     try{await listFolder(id,seen,enqueue)}
     catch(e){if(e&&BLOCK[e.code])fatal=e;else failed.push(id)}
@@ -331,7 +367,7 @@ async function crawl(){
   await one(ROOT);
   const worker=async()=>{for(;;){if(fatal)return;const id=q.shift();if(id===undefined){if(!active)return;await sleep(60);continue}active++;await one(id);active--}};
   if(!fatal&&!failed.includes(ROOT))await Promise.all([worker(),worker(),worker(),worker()]);
-  crawling=false; $("refresh").disabled=false;
+  crawling=false; prog(-1); $("refresh").disabled=false;
   if(fatal){
     if(["needs_reauth","server_not_connected","blocked_by_policy","not_in_manifest"].includes(fatal.code)){if(!indexedAt){items.clear();fromSeed()}}
     rebuild();render();setStatus("err","Sin conexión con Drive");
@@ -348,6 +384,10 @@ async function crawl(){
     rebuild();render();setStatus("err","Drive no respondió");
     banner("Google Drive no respondió. Se mantiene la última información disponible.",true,"Reintentar",crawl);
   }
+}
+function hitsBanner(){
+  if(!S.hits){banner("");return}
+  banner(fmtN(S.hits.size)+" documento(s) contienen «"+S.hitsQ+"» en su texto."+(S.hitsCut?" La consulta alcanzó su límite: precise el término para asegurar un resultado completo.":""),false,"Volver a búsqueda por nombre",()=>{S.hits=null;snippet=new Map();banner("");render()});
 }
 async function contentSearch(){
   const terms=S.q.trim().split(/\s+/).filter(Boolean);
@@ -368,8 +408,7 @@ async function contentSearch(){
       token=p.nextPageToken;
     }while(token&&++g<30);
     const cut=!!token;
-    rebuild();S.hits=hits;S.hitsQ=S.q;S.limit=PAGE;render();
-    banner(fmtN(hits.size)+" documento(s) contienen «"+S.q+"» en su texto."+(cut?" La consulta alcanzó su límite: precise el término para asegurar un resultado completo.":""),false,"Volver a búsqueda por nombre",()=>{S.hits=null;snippet=new Map();banner("");render()});
+    rebuild();S.hits=hits;S.hitsQ=S.q;S.hitsCut=cut;S.limit=PAGE;hitsBanner();render();
   }catch(e){
     banner(e&&BLOCK[e.code]?BLOCK[e.code]:"La búsqueda en contenido no respondió. Intente nuevamente.",true);
   }finally{b.disabled=false;b.textContent="Buscar en contenido"}
@@ -413,6 +452,30 @@ function sorted(a){
   });
 }
 
+/* ---------- Historial de consulta: volver y avanzar ---------- */
+const H={list:[],pos:-1,lock:false};
+let typing=null;
+function snap(){return{cur:S.cur,q:S.q,types:[...S.types].sort(),owner:S.owner,from:S.from,to:S.to,flat:S.flat,recent:S.recent,sel:S.sel,hits:S.hits?[...S.hits]:null,hitsQ:S.hitsQ,cut:!!S.hitsCut,snip:S.hits?[...snippet]:[]}}
+function navUI(){$("navB").disabled=H.pos<=0;$("navF").disabled=H.pos>=H.list.length-1}
+function mark(){
+  if(H.lock)return;
+  const o=snap(),k=JSON.stringify({...o,snip:0});
+  if(H.pos>=0&&H.list[H.pos].k===k)return;
+  H.list.splice(H.pos+1);H.list.push({o,k});
+  if(H.list.length>200)H.list.shift();
+  H.pos=H.list.length-1;navUI();
+}
+function nav(d){
+  if(typing){clearTimeout(typing);typing=null;mark()}
+  const p=H.pos+d;if(p<0||p>=H.list.length)return;
+  H.pos=p;const o=H.list[p].o;H.lock=true;
+  Object.assign(S,{cur:o.cur,q:o.q,owner:o.owner,from:o.from,to:o.to,flat:o.flat,recent:o.recent,sel:o.sel,hitsQ:o.hitsQ,hitsCut:o.cut,limit:PAGE});
+  S.types=new Set(o.types);S.hits=o.hits?new Set(o.hits):null;snippet=new Map(o.snip);
+  $("q").value=o.q;$("from").value=o.from;$("to").value=o.to;$("flat").checked=o.flat;
+  for(const x of pathOf(o.cur))S.open.add(x.id);S.open.add(o.cur);
+  hitsBanner();render();$("list").scrollTop=0;H.lock=false;navUI();
+}
+
 /* ---------- Render ---------- */
 function setStatus(c,t){$("status").className="status "+c;$("statusT").textContent=t}
 function banner(msg,err,label,fn){
@@ -436,6 +499,9 @@ function renderKpis(){
    '<div class="kpi"><b>'+fmtS(st.size)+'</b><span>Volumen total</span></div>'+
    '<button type="button" id="kNew" class="kpi'+(S.recent?" on":"")+'"><b>'+fmtN(nw)+'</b><span>Modificados en 7 días · filtrar</span></button>'+
    '<div class="kpi"><b>'+(last?fmtD(last.md):"—")+'</b><span>Último documento modificado</span></div>';
+  const vals=[...document.querySelectorAll("#kpis b")].map(b=>b.textContent);
+  if(kpiPrev.length)vals.forEach((v,i)=>{if(v!==kpiPrev[i])$("kpis").children[i].classList.add("pulse")});
+  kpiPrev=vals;
   $("kNew").onclick=()=>{S.recent=!S.recent;S.limit=PAGE;S.cur=ROOT;render()};
 }
 function renderTree(){
@@ -466,7 +532,9 @@ function renderCrumbs(n,filtering){
     '<span class="sum">'+fmtN(n)+(filtering||S.flat?" resultado(s), incluye subcarpetas":" elemento(s)")+"</span>";
 }
 const th=(k,l,cls)=>'<th'+(cls?' class="'+cls+'"':"")+' aria-sort="'+(S.sort===k?(S.dir>0?"ascending":"descending"):"none")+'"><button type="button" data-s="'+k+'">'+l+(S.sort===k?(S.dir>0?" ↑":" ↓"):"")+"</button></th>";
+let listKey="",kpiPrev=[];
 function renderList(){
+  const k=[S.cur,S.q,[...S.types],S.owner,S.from,S.to,S.flat,S.recent,S.hitsQ,!!S.hits,S.view].join("|"),anim=k!==listKey;listKey=k;
   const{a,filtering}=apply();
   shown=sorted(a);
   renderCrumbs(shown.length,filtering);
@@ -486,6 +554,7 @@ function renderList(){
   }
   if(shown.length>S.limit)h+='<div class="more"><button type="button" id="more" class="btn">Mostrar '+Math.min(PAGE,shown.length-S.limit)+" más de "+fmtN(shown.length-S.limit)+" restantes</button></div>";
   box.innerHTML=h;
+  if(anim)[...box.querySelectorAll("tr.row,.card")].slice(0,26).forEach((el,i)=>{el.style.setProperty("--i",i);el.classList.add("in")});
   const m=$("more");if(m)m.onclick=()=>{S.limit+=PAGE;renderList()};
 }
 function winPath(it){const p=pathOf(it.id).filter(x=>x.id!==ROOT).map(x=>x.t);return[WIN_ROOT,...p].join("\\")}
@@ -527,6 +596,7 @@ function renderDetail(){
 function render(){
   renderKpis();renderTree();renderFacets();renderList();renderDetail();
   $("clearq").style.display=S.q?"block":"none";
+  if(!typing)mark();
   $("vList").classList.toggle("on",S.view==="list");$("vCards").classList.toggle("on",S.view==="cards");
   document.querySelectorAll("#datePre .chip").forEach(c=>{const d=new Date(Date.now()-c.dataset.d*864e5).toISOString().slice(0,10);c.classList.toggle("on",S.from===d&&!S.to)});
 }
@@ -541,11 +611,11 @@ document.addEventListener("click",e=>{
   if(t.dataset.s){if(S.sort===t.dataset.s)S.dir=-S.dir;else{S.sort=t.dataset.s;S.dir=t.dataset.s==="name"?1:-1}renderList();return}
   if(t.dataset.t){S.types.has(t.dataset.t)?S.types.delete(t.dataset.t):S.types.add(t.dataset.t);S.limit=PAGE;render();return}
   if(t.dataset.d){const d=new Date(Date.now()-t.dataset.d*864e5).toISOString().slice(0,10);if(S.from===d&&!S.to){S.from=""}else{S.from=d;S.to=""}$("from").value=S.from;$("to").value=S.to;S.limit=PAGE;render();return}
-  if(t.dataset.id){const it=items.get(t.dataset.id);if(it&&it.m===FOLDER&&!e.target.closest(".x")){go(it.id);return}S.sel=t.dataset.id;renderList();renderDetail();}
+  if(t.dataset.id){const it=items.get(t.dataset.id);if(it&&it.m===FOLDER&&!e.target.closest(".x")){go(it.id);return}S.sel=t.dataset.id;renderList();renderDetail();mark();}
 });
 let deb;
-$("q").addEventListener("input",e=>{clearTimeout(deb);deb=setTimeout(()=>{S.q=e.target.value.trim();S.limit=PAGE;if(S.hits&&S.q!==S.hitsQ){S.hits=null;snippet=new Map();banner("")}render()},130)});
-$("q").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();S.q=e.target.value.trim();render()}});
+$("q").addEventListener("input",e=>{clearTimeout(deb);deb=setTimeout(()=>{S.q=e.target.value.trim();S.limit=PAGE;if(S.hits&&S.q!==S.hitsQ){S.hits=null;snippet=new Map();banner("")}clearTimeout(typing);typing=setTimeout(()=>{typing=null;mark()},800);render()},130)});
+$("q").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();clearTimeout(deb);clearTimeout(typing);typing=null;S.q=e.target.value.trim();render()}});
 $("clearq").onclick=()=>{$("q").value="";S.q="";S.hits=null;snippet=new Map();banner("");render();$("q").focus()};
 $("ctSearch").onclick=()=>{S.q=$("q").value.trim();contentSearch()};
 $("refresh").onclick=()=>{if(mcp)crawl();else toast("Esta vista no tiene conexión con Google Drive")};
@@ -554,6 +624,7 @@ $("from").onchange=e=>{S.from=e.target.value;S.limit=PAGE;render()};
 $("to").onchange=e=>{S.to=e.target.value;S.limit=PAGE;render()};
 $("owner").onchange=e=>{S.owner=e.target.value;S.limit=PAGE;render()};
 $("flat").onchange=e=>{S.flat=e.target.checked;S.limit=PAGE;render()};
+$("navB").onclick=()=>nav(-1);$("navF").onclick=()=>nav(1);
 $("menuTree").onclick=()=>$("tree").classList.toggle("open");
 $("clearAll").onclick=()=>{Object.assign(S,{q:"",owner:"",from:"",to:"",recent:false,flat:false,hits:null,limit:PAGE});S.types.clear();snippet=new Map();$("q").value="";$("from").value="";$("to").value="";$("flat").checked=false;banner("");render()};
 $("copyTsv").onclick=()=>{
@@ -563,6 +634,7 @@ $("copyTsv").onclick=()=>{
 document.addEventListener("keydown",e=>{
   if(e.key==="/"&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();$("q").focus()}
   if(e.key==="Escape"&&S.sel){S.sel=null;render()}
+  if(e.altKey&&(e.key==="ArrowLeft"||e.key==="ArrowRight")){e.preventDefault();nav(e.key==="ArrowLeft"?-1:1)}
 });
 
 (function(){var b=document.querySelector(".fondo");if(!b)return;var n=7,e=[],c=0,i;

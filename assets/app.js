@@ -130,31 +130,6 @@
   }
 
   const dur = () => (motion ? 800 : 0);
-  function drawResp(respuestas, med) {
-    const el = $('#c-resp'); el.replaceChildren();
-    const rows = respuestas.filter((r) => r.responde === 'IF').sort((a, b) => a.folio - b.folio);
-    const W = el.clientWidth || 800, bh = 16, gap = 6, mg = { t: 24, r: 44, b: 10, l: 96 };
-    const H = mg.t + rows.length * (bh + gap) + mg.b;
-    const x = d3.scaleLinear([0, d3.max(rows, (r) => r.dias) || 1], [mg.l, W - mg.r]).nice();
-    const svg = d3.select(el).append('svg').attr('viewBox', `0 0 ${W} ${H}`);
-    svg.append('g').attr('class', 'grid').selectAll('line').data(x.ticks(6)).join('line').attr('x1', x).attr('x2', x).attr('y1', mg.t - 4).attr('y2', H - mg.b);
-    svg.append('g').selectAll('text').data(x.ticks(6)).join('text').attr('x', x).attr('y', 12).attr('text-anchor', 'middle').text((v) => `${v} d`);
-    const mx = d3.max(rows, (r) => r.dias) || 1, m0 = med || mx / 2;
-    const color = (d) => (d <= m0 ? css('--emerald') : d <= 2 * m0 ? css('--amber') : css('--ruby'));
-    const g = svg.append('g').selectAll('g').data(rows).join('g').attr('transform', (r, i) => `translate(0,${mg.t + i * (bh + gap)})`);
-    g.append('text').attr('x', mg.l - 8).attr('y', bh - 4).attr('text-anchor', 'end').text((r) => `F${r.folio} ← F${r.ref}`);
-    g.append('rect').attr('x', mg.l).attr('height', bh).attr('rx', 3).attr('width', 0)
-      .attr('fill', (r) => color(r.dias))
-      .transition().duration(dur()).delay((r, i) => i * 30).attr('width', (r) => Math.max(1, x(r.dias) - mg.l));
-    g.append('text').attr('x', (r) => x(r.dias) + 6).attr('y', bh - 4).text((r) => r.dias).attr('opacity', 0).transition().delay(dur() + rows.length * 30).attr('opacity', 1);
-    g.append('rect').attr('width', W).attr('height', bh + gap).attr('y', -gap / 2).attr('fill', 'transparent')
-      .on('pointermove', (ev, r) => showTip(ev, `Folio ${r.folio} · ${fmtFecha(r.fecha)}`, [r.materia, `Responde al folio ${r.ref} en ${r.dias} días`])).on('pointerleave', hideTip);
-    if (med != null) {
-      svg.append('line').attr('class', 'med').attr('x1', x(med)).attr('x2', x(med)).attr('y1', mg.t - 4).attr('y2', H - mg.b);
-      svg.append('text').attr('class', 'medtxt').attr('x', x(med) + 6).attr('y', H - mg.b - 2).text(`mediana ${med} días`);
-    }
-  }
-
   function drawRegistro() {
     const tb = $('#t-reg'); tb.replaceChildren();
     const q = $('#q').value.toLowerCase().trim(), em = $('#f-em').value, pr = $('#f-pr').value;
@@ -173,7 +148,7 @@
 
   function render() {
     const { respuestas, mat, kpi } = calcular();
-    drawKpis(kpi); drawPendientes(mat); drawMaterias(mat); drawResp(respuestas, kpi.med_resp_if); drawRegistro();
+    drawKpis(kpi); drawPendientes(mat); drawMaterias(mat); drawRegistro();
   }
 
   /* ---------- Carga y actualización ---------- */
@@ -221,7 +196,7 @@
   const menu = $('#menu-ver'), btnVer = $('#btn-ver');
   btnVer.addEventListener('click', () => { unlock(); play('click'); menu.hidden = !menu.hidden; btnVer.setAttribute('aria-expanded', String(!menu.hidden)); });
   document.addEventListener('click', (e) => { if (!e.target.closest('.menu')) { menu.hidden = true; btnVer.setAttribute('aria-expanded', 'false'); } });
-  const VISTAS = ['todo', 'pendientes', 'respuesta', 'materias', 'registro'];
+  const VISTAS = ['todo', 'pendientes', 'materias', 'registro'];
   let rot = null;
   function setVista(v, silencio) {
     state.view = v; const mostrar = v === 'presentacion' ? VISTAS[1] : v;
@@ -242,7 +217,6 @@
     if (k === state.sortKey) state.sortDir = -state.sortDir; else { state.sortKey = k; state.sortDir = 1; }
     drawRegistro();
   }));
-  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (state.folios.length) { const { respuestas, kpi } = calcular(); drawResp(respuestas, kpi.med_resp_if); } }, 200); });
 
   actualizar('inicio');
 })();
