@@ -1,7 +1,7 @@
 /* Visor Control Proyecto CyD — Libro de Obra Digital (Construcción) */
 (() => {
   'use strict';
-  const PERIODO_MS = 5 * 60 * 1000;           // ciclo de actualización: 5 minutos
+  const PERIODO_MS = 7 * 24 * 3600 * 1000;    // ciclo de actualización: una semana
   const ROTACION_MS = 12 * 1000;              // modo presentación: cambio de vista
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -178,12 +178,12 @@
     }
   }
 
-  // Barra de actualización: ciclo de 5 minutos.
+  // Barra de actualización: ciclo semanal.
   setInterval(() => {
     const rest = Math.max(0, state.next - Date.now());
     $('#bar-fill').style.width = `${100 * (1 - rest / PERIODO_MS)}%`;
-    const m = Math.floor(rest / 60000), s = Math.floor((rest % 60000) / 1000);
-    $('#cuenta').textContent = `Próxima actualización en ${m}:${String(s).padStart(2, '0')}`;
+    const d = Math.floor(rest / 864e5), h = Math.floor((rest % 864e5) / 36e5), m = Math.floor((rest % 36e5) / 6e4);
+    $('#cuenta').textContent = `Próxima actualización automática en ${d} d ${h} h ${m} min`;
     if (rest === 0 && !state.loading) actualizar('auto');
   }, 1000);
 

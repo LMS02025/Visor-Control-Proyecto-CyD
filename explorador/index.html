@@ -7,6 +7,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+(function(){var K="modo-visor-cyd",M=["dia","noche","luna"],L={dia:"Día",noche:"Noche",luna:"Luna"},
+I={dia:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3 7 7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7"/>',
+noche:'<path d="M12 3.5l1.9 4.9 5.1.4-3.9 3.3 1.2 5-4.3-2.7-4.3 2.7 1.2-5L5 8.8l5.1-.4z"/><path d="M19.5 16.5v3M18 18h3"/>',
+luna:'<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/><path d="M17 4.5v3M15.5 6h3"/>'},r=document.documentElement,m;
+try{m=localStorage.getItem(K)}catch(e){}
+if(M.indexOf(m)<0)m=(window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches)?"dia":"noche";
+r.setAttribute("data-modo",m);
+function pinta(b){b.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+I[m]+'</svg>'+L[m];b.title="Modo de visualización: "+L[m]+". Pulse para cambiar a "+L[M[(M.indexOf(m)+1)%3]];b.setAttribute("aria-label",b.title)}
+function ini(){var b=document.getElementById("btn-modo");if(!b)return;pinta(b);b.addEventListener("click",function(){m=M[(M.indexOf(m)+1)%3];r.classList.add("cambio");r.setAttribute("data-modo",m);try{localStorage.setItem(K,m)}catch(e){}pinta(b);setTimeout(function(){r.classList.remove("cambio")},500)})}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",ini);else ini()})();
+</script>
 <style>
 /* Disposición: consola de control documental. Árbol de series a la izquierda, registro al centro, ficha a la derecha. */
 :root{
@@ -172,6 +184,29 @@ header,.tools,#list,#detail,.kpi{background:var(--glass)}
 .kpi+.kpi{border-left:1px solid var(--line)}
 button.kpi:hover,.kpi.on{background:color-mix(in srgb,var(--accent-soft) 80%,transparent)}
 @media (max-width:1040px){#detail{background:var(--panel)}}
+/* Modos de visualización y realce */
+:root[data-modo="dia"]{--bg:#e9eef3;--panel:#ffffff;--sunk:#f3f6f9;--ink:#14212c;--mute:#50616f;--line:#c9d3db;--accent:#007f9e;--accent-soft:#d3ecf3;--accent-ink:#ffffff;--ok:#16805a;--warn:#a4660b;--crit:#c02f25;--t-pdf:#c02f25;--t-xls:#16805a;--t-doc:#1f5fc2;--t-ppt:#c25a1c;--t-img:#7d44b0;--t-cad:#007f9e;--t-mail:#866a10;--t-zip:#50616f;--t-oth:#50616f;--violeta:#6a43d6;color-scheme:light}
+:root[data-modo="noche"]{--bg:#0d141a;--panel:#17212a;--sunk:#121a21;--ink:#e8eff4;--mute:#9db0be;--line:#2f404d;--accent:#3fc1de;--accent-soft:#143744;--accent-ink:#06222b;--ok:#4fd0a2;--warn:#eeb054;--crit:#ff8378;--t-pdf:#ff8378;--t-xls:#4fd0a2;--t-doc:#84b2f2;--t-ppt:#f2a169;--t-img:#c29ce4;--t-cad:#3fc1de;--t-mail:#dcc060;--t-zip:#9db0be;--t-oth:#9db0be;--violeta:#a98bf5;color-scheme:dark}
+:root[data-modo="luna"]{--bg:#0b1030;--panel:#171e48;--sunk:#121839;--ink:#eef1ff;--mute:#aeb8e0;--line:#333f7c;--accent:#aebfff;--accent-soft:#262f68;--accent-ink:#0d1336;--ok:#66e0c4;--warn:#f3c76f;--crit:#ff8fa8;--t-pdf:#ff8fa8;--t-xls:#66e0c4;--t-doc:#9db7ff;--t-ppt:#f6ad7c;--t-img:#cdb0ff;--t-cad:#7fe0ee;--t-mail:#f3c76f;--t-zip:#aeb8e0;--t-oth:#aeb8e0;--violeta:#c9b3ff;color-scheme:dark}
+:root[data-modo="noche"] .fondo i{filter:brightness(.8)}
+:root[data-modo="luna"] .fondo i{filter:grayscale(.65) brightness(.72) sepia(.15) hue-rotate(190deg)}
+.cambio *{transition:background-color .4s,color .4s,border-color .4s!important}
+.btn{border:1.5px solid var(--accent);color:var(--accent);font-weight:600}
+.btn:hover{background:var(--accent);color:var(--accent-ink)}
+.btn.modo{background:var(--violeta);border-color:var(--violeta);color:var(--panel)}
+.btn.modo:hover{background:var(--violeta);color:var(--panel);filter:brightness(1.12)}
+.btn.primary{box-shadow:0 5px 14px -5px var(--accent)}
+.nav{border:1.5px solid var(--accent)}
+.nav button{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav button:not(:disabled):hover{background:var(--accent);color:var(--accent-ink)}
+.chip{border-width:1.5px;font-weight:500}
+.chip.on{box-shadow:0 3px 10px -3px var(--accent)}
+.seg button.on{background:var(--accent);color:var(--accent-ink)}
+.ty{border:0;color:var(--panel);font-weight:600}
+.kpi b{color:var(--accent)}
+.tn.cur{font-weight:600;box-shadow:0 3px 10px -4px var(--accent)}
+.crumbs button{font-weight:500}
+th{color:var(--accent)}
 /* Efectos visuales */
 .fondo i{animation:kb 42s ease-in-out infinite alternate;will-change:transform}
 @keyframes kb{from{transform:scale(1) translate3d(0,0,0)}to{transform:scale(1.1) translate3d(-1.5%,-1%,0)}}
@@ -211,10 +246,11 @@ tr.row:hover .ty,.card:hover .ty{transform:scale(1.12)}
 <header>
   <div class="brand">
     <h1>Explorador DOCUMENTACION · Planta Desaladora Coquimbo</h1>
-    <p>Repositorio documental CyD en Google Drive, consulta en modo lectura con actualización automática cada 30 minutos</p>
+    <p>Repositorio documental CyD en Google Drive, consulta en modo lectura con actualización automática semanal</p>
   </div>
   <span id="status" class="status"><span class="dot"></span><span id="statusT">Iniciando</span></span>
-  <button id="refresh" class="btn" type="button">Actualizar índice</button>
+  <button id="btn-modo" class="btn modo" type="button">Modo</button>
+  <button id="refresh" class="btn primary" type="button">Actualizar índice</button>
   <div id="prog" aria-hidden="true"><i></i></div>
 </header>
 
@@ -235,7 +271,7 @@ tr.row:hover .ty,.card:hover .ty{transform:scale(1.12)}
           <input id="q" type="search" autocomplete="off" placeholder="Buscar por nombre o ruta: folio 67, PEPID, USCI 4, .xlsx" aria-label="Buscar por nombre o ruta">
           <button id="clearq" type="button" aria-label="Limpiar búsqueda">✕</button>
         </div>
-        <button id="ctSearch" class="btn" type="button" title="Busca el texto dentro de los documentos mediante Google Drive">Buscar en contenido</button>
+        <button id="ctSearch" class="btn primary" type="button" title="Busca el texto dentro de los documentos mediante Google Drive">Buscar en contenido</button>
         <div class="seg" role="group" aria-label="Vista">
           <button id="vList" type="button" class="on">Lista</button><button id="vCards" type="button">Fichas</button>
         </div>
@@ -267,7 +303,7 @@ tr.row:hover .ty,.card:hover .ty{transform:scale(1.12)}
 const ROOT="__ID_CARPETA_DRIVE__", ROOT_NAME="DOCUMENTACION", SERVER="Google Drive";
 const WIN_ROOT="G:\\.shortcut-targets-by-id\\"+ROOT+"\\"+ROOT_NAME;
 const FOLDER="application/vnd.google-apps.folder";
-const AUTO_MS=30*60e3, PAGE=150;
+const AUTO_MS=7*864e5, PAGE=150;
 /* Nivel superior leído al publicar: permite orientarse mientras se conecta Drive. */
 const SEED=[]; /* Versión de repositorio: identificadores de Drive excluidos. */
 const TYPES=[["pdf","PDF","PDF","--t-pdf"],["xls","Excel","XLS","--t-xls"],["doc","Word","DOC","--t-doc"],["ppt","PowerPoint","PPT","--t-ppt"],["img","Imagen","IMG","--t-img"],["cad","CAD / BIM / GIS","CAD","--t-cad"],["mail","Correo","MSG","--t-mail"],["zip","Comprimido","ZIP","--t-zip"],["oth","Otros","OTR","--t-oth"]];
@@ -487,7 +523,7 @@ function banner(msg,err,label,fn){
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("show"),1900)}
 function badge(it){
   if(it.m===FOLDER)return '<svg width="30" height="20" viewBox="0 0 30 20" style="flex:none;color:var(--accent);margin-top:0" aria-label="Carpeta"><path d="M3 4h8l2 2.4h13v11H3z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
-  const t=TY[typeOf(it)];return '<span class="ty" style="color:var('+t[3]+')">'+t[2]+"</span>";
+  const t=TY[typeOf(it)];return '<span class="ty" style="background:var('+t[3]+')">'+t[2]+"</span>";
 }
 function renderKpis(){
   const st=stats.get(ROOT)||{files:0,folders:0,size:0};
@@ -650,7 +686,7 @@ setInterval(function(){e[c].className="";c=(c+1)%n;e[c].className="on"},14000)})
   try{mcp=window.claude?await window.claude.use("mcp"):null}catch(e){mcp=null}
   if(!mcp){setStatus("err","Sin conexión con Drive");banner("Esta copia del repositorio es código fuente y no tiene conexión con Google Drive.",true,"Abrir panel en claude.ai",()=>{location.href="https://claude.ai/artifact/MFFk47NGSvPQMffjYbyyE7"});return}
   if(!indexedAt||Date.now()-indexedAt>AUTO_MS)crawl();
-  setInterval(()=>{if(!crawling&&document.visibilityState==="visible"&&Date.now()-Math.max(lastTry,indexedAt||0)>=AUTO_MS)crawl()},60000);
+  setInterval(()=>{if(!crawling&&document.visibilityState==="visible"&&Date.now()-Math.max(lastTry,indexedAt||0)>=AUTO_MS)crawl()},3600000);
 })();
 </script>
 </body>

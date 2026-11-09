@@ -11,7 +11,8 @@ El visor consolida los folios intercambiados entre la Sociedad Concesionaria Des
 | **Visualizar** | Menú de vistas: panel completo, acciones pendientes, estado de materias, registro de folios y modo presentación (rotación automática cada 12 s). |
 | **Modo documentación** | Abre en claude.ai el panel documental de la carpeta `DOCUMENTACION`, con árbol, búsqueda y filtros. |
 | **Actualizar** | Vuelve a leer `data/*.json`, recalcula los indicadores y anuncia con aviso visual y sonoro los folios nuevos. |
-| **Barra de actualización** | Ciclo de 5 minutos con cuenta regresiva; al completarse, actualiza el contenido de forma automática. |
+| **Barra de actualización** | Ciclo semanal con cuenta regresiva; al completarse, actualiza el contenido de forma automática. Cada apertura o recarga trae los datos vigentes. |
+| **Modo de visualización** | Botón que alterna entre los modos Día, Noche y Luna y recuerda la selección en el navegador. |
 | **Sonido** | Señales generadas con Web Audio (sin archivos externos), con botón para silenciarlas. El navegador habilita el audio después del primer clic en la página. |
 | **Animación** | Entrada escalonada de tarjetas, contadores progresivos, barras con crecimiento animado y resaltado de folios nuevos. Se desactiva si el sistema operativo pide reducir el movimiento. |
 
