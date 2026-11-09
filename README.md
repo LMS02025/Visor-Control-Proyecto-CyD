@@ -20,6 +20,7 @@ El visor consolida los folios intercambiados entre la Sociedad Concesionaria Des
 index.html                  Visor (HTML + CSS + JS, sin dependencias de red)
 assets/style.css, app.js    Estilos y lógica
 explorador/index.html       Explorador documental (código fuente, sin identificadores de Drive)
+explorador/fondos/          Fotografías de fondo en rotación (visor y explorador)
 vendor/d3.min.js            d3 v7
 data/folios.json            Un registro por folio
 data/materias.json          Materias contractuales, estado y parte que debe responder
@@ -33,7 +34,7 @@ scripts/config.json         ID de la carpeta de Drive y firmantes de cada parte
 
 `explorador/index.html` contiene el código fuente del explorador de la carpeta `DOCUMENTACION`: árbol de series, búsqueda por nombre, ruta y contenido, filtros por tipo, fecha y propietario, y ficha de cada documento.
 
-La página opera en [claude.ai](https://claude.ai/artifact/MFFk47NGSvPQMffjYbyyE7), donde consulta Google Drive en modo lectura con el conector de quien la abre y según los permisos de esa cuenta. La copia de este repositorio no accede a Drive y excluye deliberadamente los identificadores de carpeta, porque el repositorio es público. El marcador `__ID_CARPETA_DRIVE__` reemplaza al identificador real.
+La copia de este repositorio no accede a Drive y excluye deliberadamente los identificadores de carpeta, porque el repositorio es público. El marcador `__ID_CARPETA_DRIVE__` reemplaza al identificador real.
 
 ## Publicación (GitHub Pages)
 

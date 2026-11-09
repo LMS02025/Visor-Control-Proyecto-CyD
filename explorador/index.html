@@ -160,9 +160,23 @@ dt{color:var(--mute)} dd{margin:0;overflow-wrap:anywhere}
   #list{overflow:auto;max-height:none}
   .cHide{display:none}
 }
+/* Fotografías tenues en rotación detrás de los paneles translúcidos */
+.fondo{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.fondo i{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 2.4s ease}
+.fondo i.on{opacity:.55}
+header,.kpis,#banner,main{position:relative;z-index:1}
+:root{--glass:color-mix(in srgb,var(--panel) 74%,transparent);--glass2:color-mix(in srgb,var(--sunk) 74%,transparent)}
+header,.tools,#list,#detail,.kpi{background:var(--glass)}
+#tree,.crumbs{background:var(--glass2)}
+.kpis{background:none;gap:0}
+.kpi+.kpi{border-left:1px solid var(--line)}
+button.kpi:hover,.kpi.on{background:color-mix(in srgb,var(--accent-soft) 80%,transparent)}
+@media (max-width:1040px){#detail{background:var(--panel)}}
+@media (prefers-reduced-motion:reduce){.fondo i{transition:none}}
 </style>
 </head>
 <body>
+<div class="fondo" aria-hidden="true"></div>
 <header>
   <div class="brand">
     <h1>Explorador DOCUMENTACION · Planta Desaladora Coquimbo</h1>
@@ -220,7 +234,7 @@ const WIN_ROOT="G:\\.shortcut-targets-by-id\\"+ROOT+"\\"+ROOT_NAME;
 const FOLDER="application/vnd.google-apps.folder";
 const STALE_MS=6*3600e3, PAGE=150;
 /* Nivel superior leído al publicar: permite orientarse mientras se conecta Drive. */
-const SEED=[]; /* Versión de repositorio público: identificadores de Drive excluidos. */
+const SEED=[]; /* Versión de repositorio: identificadores de Drive excluidos. */
 const TYPES=[["pdf","PDF","PDF","--t-pdf"],["xls","Excel","XLS","--t-xls"],["doc","Word","DOC","--t-doc"],["ppt","PowerPoint","PPT","--t-ppt"],["img","Imagen","IMG","--t-img"],["cad","CAD / BIM / GIS","CAD","--t-cad"],["mail","Correo","MSG","--t-mail"],["zip","Comprimido","ZIP","--t-zip"],["oth","Otros","OTR","--t-oth"]];
 const TY=Object.fromEntries(TYPES.map(t=>[t[0],t]));
 const EXT={pdf:"pdf",xlsx:"xls",xls:"xls",xlsm:"xls",csv:"xls",ods:"xls",docx:"doc",doc:"doc",odt:"doc",rtf:"doc",pptx:"ppt",ppt:"ppt",odp:"ppt",png:"img",jpg:"img",jpeg:"img",gif:"img",tif:"img",tiff:"img",bmp:"img",webp:"img",heic:"img",dwg:"cad",dxf:"cad",rvt:"cad",ifc:"cad",nwd:"cad",nwc:"cad",kmz:"cad",kml:"cad",shp:"cad",mpp:"cad",msg:"mail",eml:"mail",zip:"zip",rar:"zip","7z":"zip",tar:"zip",gz:"zip"};
@@ -281,15 +295,15 @@ async function call(tool,input,tries){
   catch(e){if(e&&e.retryable&&!tries){await sleep((e.retryAfterMs||600)+Math.random()*700);return call(tool,input,1)}throw e}
 }
 const BLOCK={
-  needs_reauth:"La sesión de Google Drive venció. Reconecte Google Drive en claude.ai, Configuración, Conectores, y pulse Reintentar.",
-  server_not_connected:"Esta cuenta no tiene Google Drive conectado. Agréguelo en claude.ai, Configuración, Conectores, y pulse Reintentar.",
-  selection_required:"Hay más de una conexión de Google Drive. Elija una en el aviso de claude.ai y pulse Reintentar.",
+  needs_reauth:"La sesión de Google Drive venció. Reconecte Google Drive en Configuración, Conectores, y pulse Reintentar.",
+  server_not_connected:"Esta cuenta no tiene Google Drive conectado. Agréguelo en Configuración, Conectores, y pulse Reintentar.",
+  selection_required:"Hay más de una conexión de Google Drive. Elija una en el aviso de conexión y pulse Reintentar.",
   not_in_manifest:"El acceso a Google Drive no está permitido para esta página. Actívelo en el aviso de permisos de la página.",
   blocked_by_policy:"La política de la organización bloquea este acceso a Google Drive.",
   approval_required:"Falta su autorización para leer Google Drive. Pulse Reintentar y acepte el aviso.",
   consent_required:"Falta su autorización para leer Google Drive. Pulse Reintentar y acepte el aviso.",
-  not_granted:"Esta vista no puede usar conectores. Abra la página en claude.ai.",
-  capability_disabled:"Esta vista no puede usar conectores. Abra la página en claude.ai."
+  not_granted:"Esta vista no tiene conexión con Google Drive.",
+  capability_disabled:"Esta vista no tiene conexión con Google Drive."
 };
 async function listFolder(id,seen,enqueue){
   let token,guard=0;
@@ -534,7 +548,7 @@ $("q").addEventListener("input",e=>{clearTimeout(deb);deb=setTimeout(()=>{S.q=e.
 $("q").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();S.q=e.target.value.trim();render()}});
 $("clearq").onclick=()=>{$("q").value="";S.q="";S.hits=null;snippet=new Map();banner("");render();$("q").focus()};
 $("ctSearch").onclick=()=>{S.q=$("q").value.trim();contentSearch()};
-$("refresh").onclick=()=>{if(mcp)crawl();else toast("Abra esta página en claude.ai con Google Drive conectado")};
+$("refresh").onclick=()=>{if(mcp)crawl();else toast("Esta vista no tiene conexión con Google Drive")};
 $("vList").onclick=()=>{S.view="list";render()};$("vCards").onclick=()=>{S.view="cards";render()};
 $("from").onchange=e=>{S.from=e.target.value;S.limit=PAGE;render()};
 $("to").onchange=e=>{S.to=e.target.value;S.limit=PAGE;render()};
@@ -551,13 +565,18 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Escape"&&S.sel){S.sel=null;render()}
 });
 
+(function(){var b=document.querySelector(".fondo");if(!b)return;var n=7,e=[],c=0,i;
+for(i=1;i<=n;i++){var d=document.createElement("i");d.style.backgroundImage='url("fondos/'+i+'.jpg")';b.appendChild(d);e.push(d)}
+e[0].className="on";
+if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+setInterval(function(){e[c].className="";c=(c+1)%n;e[c].className="on"},14000)})();
 /* ---------- Arranque ---------- */
 (async function(){
   fromSeed();rebuild();render();setStatus("busy","Conectando con Google Drive");
   const snap=await loadSnap();
   if(snap&&snap.items&&snap.items.length){items.clear();for(const x of snap.items)items.set(x.id,x);indexedAt=snap.at;rebuild();render();setStatus("ok","Índice al "+fmtDT(indexedAt))}
   try{mcp=window.claude?await window.claude.use("mcp"):null}catch(e){mcp=null}
-  if(!mcp){setStatus("err","Sin conexión con Drive");banner("Este explorador consulta Google Drive mediante el conector de claude.ai. Esta copia del repositorio es código fuente y no contiene datos.",true,"Abrir en claude.ai",()=>{location.href="https://claude.ai/artifact/MFFk47NGSvPQMffjYbyyE7"});return}
+  if(!mcp){setStatus("err","Sin conexión con Drive");banner("Esta copia del repositorio es código fuente y no tiene conexión con Google Drive.",true);return}
   if(!indexedAt||Date.now()-indexedAt>STALE_MS)crawl();
 })();
 </script>

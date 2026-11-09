@@ -196,3 +196,14 @@ th { background: var(--c, var(--gold)); color: #fff; border-bottom: 0; }
 .badge.st-if { color: #241600; }
 
 a.btn { text-decoration: none; }
+
+/* Fotografías tenues en rotación */
+.fondo { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.fondo i { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 2.4s ease; }
+.fondo i.on { opacity: .55; }
+.app { position: relative; z-index: 1; }
+/* Paneles translúcidos: las fotografías se aprecian en toda la aplicación */
+.takeaway, .card, .top, .refresh, .foot { background: color-mix(in srgb, var(--panel-solid) 72%, transparent); }
+.top, .refresh, .foot { border-radius: var(--radius); padding: 12px 16px; }
+.tile { background: color-mix(in srgb, var(--c) 86%, transparent); }
+@media (prefers-reduced-motion: reduce) { .fondo i { transition: none; } }
