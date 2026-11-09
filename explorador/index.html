@@ -576,7 +576,7 @@ setInterval(function(){e[c].className="";c=(c+1)%n;e[c].className="on"},14000)})
   const snap=await loadSnap();
   if(snap&&snap.items&&snap.items.length){items.clear();for(const x of snap.items)items.set(x.id,x);indexedAt=snap.at;rebuild();render();setStatus("ok","Última actualización: "+fmtDT(indexedAt))}
   try{mcp=window.claude?await window.claude.use("mcp"):null}catch(e){mcp=null}
-  if(!mcp){setStatus("err","Sin conexión con Drive");banner("Esta copia del repositorio es código fuente y no tiene conexión con Google Drive.",true);return}
+  if(!mcp){setStatus("err","Sin conexión con Drive");banner("Esta copia del repositorio es código fuente y no tiene conexión con Google Drive.",true,"Abrir panel en claude.ai",()=>{location.href="https://claude.ai/artifact/MFFk47NGSvPQMffjYbyyE7"});return}
   if(!indexedAt||Date.now()-indexedAt>AUTO_MS)crawl();
   setInterval(()=>{if(!crawling&&document.visibilityState==="visible"&&Date.now()-Math.max(lastTry,indexedAt||0)>=AUTO_MS)crawl()},60000);
 })();

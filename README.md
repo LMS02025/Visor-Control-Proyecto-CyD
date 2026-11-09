@@ -9,7 +9,7 @@ El visor consolida los folios intercambiados entre la Sociedad Concesionaria Des
 | Elemento | Descripción |
 |---|---|
 | **Visualizar** | Menú de vistas: panel completo, acciones pendientes, tiempo de respuesta IF, estado de materias, registro de folios y modo presentación (rotación automática cada 12 s). |
-| **Modo documentación** | Abre la carpeta `DOCUMENTACION` en Google Drive. |
+| **Modo documentación** | Abre en claude.ai el panel documental de la carpeta `DOCUMENTACION`, con árbol, búsqueda y filtros. |
 | **Actualizar** | Vuelve a leer `data/*.json`, recalcula los indicadores y anuncia con aviso visual y sonoro los folios nuevos. |
 | **Barra de actualización** | Ciclo de 5 minutos con cuenta regresiva; al completarse, actualiza el contenido de forma automática. |
 | **Sonido** | Señales generadas con Web Audio (sin archivos externos), con botón para silenciarlas. El navegador habilita el audio después del primer clic en la página. |
@@ -35,7 +35,7 @@ scripts/config.json         ID de la carpeta de Drive y firmantes de cada parte
 
 `explorador/index.html` contiene el código fuente del explorador de la carpeta `DOCUMENTACION`: árbol de series, búsqueda por nombre, ruta y contenido, filtros por tipo, fecha y propietario, y ficha de cada documento.
 
-La copia de este repositorio no accede a Drive y excluye deliberadamente los identificadores de carpeta, porque el repositorio es público. El marcador `__ID_CARPETA_DRIVE__` reemplaza al identificador real.
+La página operativa está en [claude.ai](https://claude.ai/artifact/MFFk47NGSvPQMffjYbyyE7) y consulta Google Drive en modo lectura con el conector de quien la abre. La copia de este repositorio no accede a Drive y excluye deliberadamente los identificadores de carpeta, porque el repositorio es público. El marcador `__ID_CARPETA_DRIVE__` reemplaza al identificador real.
 
 ## Publicación (GitHub Pages)
 
