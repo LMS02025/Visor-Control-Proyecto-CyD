@@ -180,7 +180,7 @@ button.kpi:hover,.kpi.on{background:color-mix(in srgb,var(--accent-soft) 80%,tra
 <header>
   <div class="brand">
     <h1>Explorador DOCUMENTACION · Planta Desaladora Coquimbo</h1>
-    <p>Repositorio documental CyD en Google Drive, consulta en modo lectura con la cuenta de quien abre esta página</p>
+    <p>Repositorio documental CyD en Google Drive, consulta en modo lectura con actualización automática cada 30 minutos</p>
   </div>
   <span id="status" class="status"><span class="dot"></span><span id="statusT">Iniciando</span></span>
   <button id="refresh" class="btn" type="button">Actualizar índice</button>
@@ -232,7 +232,7 @@ button.kpi:hover,.kpi.on{background:color-mix(in srgb,var(--accent-soft) 80%,tra
 const ROOT="__ID_CARPETA_DRIVE__", ROOT_NAME="DOCUMENTACION", SERVER="Google Drive";
 const WIN_ROOT="G:\\.shortcut-targets-by-id\\"+ROOT+"\\"+ROOT_NAME;
 const FOLDER="application/vnd.google-apps.folder";
-const STALE_MS=6*3600e3, PAGE=150;
+const AUTO_MS=30*60e3, PAGE=150;
 /* Nivel superior leído al publicar: permite orientarse mientras se conecta Drive. */
 const SEED=[]; /* Versión de repositorio: identificadores de Drive excluidos. */
 const TYPES=[["pdf","PDF","PDF","--t-pdf"],["xls","Excel","XLS","--t-xls"],["doc","Word","DOC","--t-doc"],["ppt","PowerPoint","PPT","--t-ppt"],["img","Imagen","IMG","--t-img"],["cad","CAD / BIM / GIS","CAD","--t-cad"],["mail","Correo","MSG","--t-mail"],["zip","Comprimido","ZIP","--t-zip"],["oth","Otros","OTR","--t-oth"]];
@@ -315,10 +315,10 @@ async function listFolder(id,seen,enqueue){
     token=p.nextPageToken;
   }while(token&&++guard<300);
 }
-let done=0,total=1;
+let done=0,total=1,lastTry=0;
 async function crawl(){
   if(crawling||!mcp)return;
-  crawling=true; failed=[]; done=0; total=1; banner("");
+  crawling=true; lastTry=Date.now(); failed=[]; done=0; total=1; banner("");
   setStatus("busy","Indexando carpetas"); $("refresh").disabled=true;
   const seen=new Set(), q=[]; let active=0, fatal=null, last=0;
   const enqueue=id=>{q.push(id);total++};
@@ -342,7 +342,7 @@ async function crawl(){
     indexedAt=Date.now();
     for(const it of items.values())delete it._h;
     rebuild();render();saveSnap();
-    setStatus(failed.length?"err":"ok",(failed.length?"Índice parcial · ":"Índice al ")+fmtDT(indexedAt));
+    setStatus(failed.length?"err":"ok",(failed.length?"Última actualización parcial: ":"Última actualización: ")+fmtDT(indexedAt));
     if(failed.length)banner(failed.length+" carpeta(s) no respondieron y su contenido puede estar incompleto.",true,"Reintentar",crawl);
   }else{
     rebuild();render();setStatus("err","Drive no respondió");
@@ -574,10 +574,11 @@ setInterval(function(){e[c].className="";c=(c+1)%n;e[c].className="on"},14000)})
 (async function(){
   fromSeed();rebuild();render();setStatus("busy","Conectando con Google Drive");
   const snap=await loadSnap();
-  if(snap&&snap.items&&snap.items.length){items.clear();for(const x of snap.items)items.set(x.id,x);indexedAt=snap.at;rebuild();render();setStatus("ok","Índice al "+fmtDT(indexedAt))}
+  if(snap&&snap.items&&snap.items.length){items.clear();for(const x of snap.items)items.set(x.id,x);indexedAt=snap.at;rebuild();render();setStatus("ok","Última actualización: "+fmtDT(indexedAt))}
   try{mcp=window.claude?await window.claude.use("mcp"):null}catch(e){mcp=null}
   if(!mcp){setStatus("err","Sin conexión con Drive");banner("Esta copia del repositorio es código fuente y no tiene conexión con Google Drive.",true);return}
-  if(!indexedAt||Date.now()-indexedAt>STALE_MS)crawl();
+  if(!indexedAt||Date.now()-indexedAt>AUTO_MS)crawl();
+  setInterval(()=>{if(!crawling&&document.visibilityState==="visible"&&Date.now()-Math.max(lastTry,indexedAt||0)>=AUTO_MS)crawl()},60000);
 })();
 </script>
 </body>

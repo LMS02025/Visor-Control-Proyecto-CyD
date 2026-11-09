@@ -8,7 +8,8 @@ El visor consolida los folios intercambiados entre la Sociedad Concesionaria Des
 
 | Elemento | Descripción |
 |---|---|
-| **Visualizar** | Menú de vistas: panel completo, acciones pendientes, gráficos de flujo, tiempo de respuesta IF, estado de materias, registro de folios y modo presentación (rotación automática cada 12 s). |
+| **Visualizar** | Menú de vistas: panel completo, acciones pendientes, tiempo de respuesta IF, estado de materias, registro de folios y modo presentación (rotación automática cada 12 s). |
+| **Modo documentación** | Abre la carpeta `DOCUMENTACION` en Google Drive. |
 | **Actualizar** | Vuelve a leer `data/*.json`, recalcula los indicadores y anuncia con aviso visual y sonoro los folios nuevos. |
 | **Barra de actualización** | Ciclo de 5 minutos con cuenta regresiva; al completarse, actualiza el contenido de forma automática. |
 | **Sonido** | Señales generadas con Web Audio (sin archivos externos), con botón para silenciarlas. El navegador habilita el audio después del primer clic en la página. |

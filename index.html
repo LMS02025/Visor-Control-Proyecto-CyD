@@ -26,13 +26,16 @@
         <div class="menu-list" id="menu-ver" role="menu" hidden>
           <button role="menuitemradio" data-view="todo" aria-checked="true">Todo el panel</button>
           <button role="menuitemradio" data-view="pendientes" aria-checked="false">Acciones pendientes</button>
-          <button role="menuitemradio" data-view="graficos" aria-checked="false">Gráficos de flujo</button>
           <button role="menuitemradio" data-view="respuesta" aria-checked="false">Tiempo de respuesta IF</button>
           <button role="menuitemradio" data-view="materias" aria-checked="false">Estado de materias</button>
           <button role="menuitemradio" data-view="registro" aria-checked="false">Registro de folios</button>
           <button role="menuitemradio" data-view="presentacion" aria-checked="false">Modo presentación (rotativo)</button>
         </div>
       </div>
+      <a class="btn" href="https://drive.google.com/drive/folders/1qE7RTR4z_strb9wIW6wNiP5QTRQPwkrB" target="_blank" rel="noopener" title="Abre la carpeta DOCUMENTACION en Google Drive">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h6.5l2 2.5H21v10H3z"/></svg>
+        Modo documentación
+      </a>
       <button class="btn primary" id="btn-act">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>
         Actualizar
@@ -53,7 +56,7 @@
       <p>Al <b data-k="corte">—</b> (fecha de corte), el libro registra <b data-k="total">—</b> folios; el último fue emitido el <b data-k="ultima">—</b>. <b class="warn" data-k="pend_if">—</b> materias esperan pronunciamiento de la Inspección Fiscal y <b class="bad" data-k="pend_sc">—</b> esperan respuesta de la Sociedad Concesionaria.</p>
     </section>
 
-    <section class="tiles" data-views="todo pendientes graficos">
+    <section class="tiles" data-views="todo pendientes">
       <div class="tile"><div class="lbl">Folios registrados</div><div class="val" data-k="total">—</div><div class="note">Desde el <span data-k="primera">—</span></div></div>
       <div class="tile"><div class="lbl">Emitidos por la SC</div><div class="val" data-k="sc">—</div><div class="note">Soc. Concesionaria Desaladora de Panul S.A.</div></div>
       <div class="tile"><div class="lbl">Emitidos por la IF</div><div class="val" data-k="if_">—</div><div class="note">Inspección Fiscal (titular y subrogante)</div></div>
@@ -71,22 +74,7 @@
       </table></div>
     </section>
 
-    <div class="grid2" data-views="todo graficos">
-      <section class="card">
-        <h2>Folios por mes</h2>
-        <p class="hint">Folios ingresados cada mes, por emisor.</p>
-        <div class="legend"><span><i class="sc"></i>Sociedad Concesionaria</span><span><i class="if"></i>Inspección Fiscal</span></div>
-        <div class="chart" id="c-mes"></div>
-      </section>
-      <section class="card">
-        <h2>Folios por prioridad</h2>
-        <p class="hint">Prioridad asignada por el emisor.</p>
-        <div class="legend"><span><i class="sc"></i>Sociedad Concesionaria</span><span><i class="if"></i>Inspección Fiscal</span></div>
-        <div class="chart" id="c-prio"></div>
-      </section>
-    </div>
-
-    <section class="card" id="respuesta" data-views="todo respuesta graficos">
+    <section class="card" id="respuesta" data-views="todo respuesta">
       <h2>Tiempo de respuesta de la Inspección Fiscal</h2>
       <p class="hint">Días entre cada presentación de la SC y el folio de la IF que la responde. Verde: hasta la mediana; ámbar: hasta el doble de la mediana; rojo: sobre el doble. La línea marca la mediana.</p>
       <div class="chart" id="c-resp"></div>
