@@ -194,3 +194,5 @@ th { background: var(--c, var(--gold)); color: #fff; border-bottom: 0; }
 .chart text.medtxt { fill: var(--fg); }
 .st-sc { --c: var(--sapphire); }
 .badge.st-if { color: #241600; }
+
+a.btn { text-decoration: none; }
