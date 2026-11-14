@@ -11,7 +11,7 @@ El visor consolida los folios intercambiados entre la Sociedad Concesionaria Des
 | **Visualizar** | Menú de vistas: panel completo, acciones pendientes, estado de materias, registro de folios y modo presentación (rotación automática cada 12 s). |
 | **Modo documentación** | Abre en claude.ai el panel documental de la carpeta `DOCUMENTACION`, con árbol, búsqueda y filtros. |
 | **Actualizar** | Vuelve a leer `data/*.json`, recalcula los indicadores y anuncia con aviso visual y sonoro los folios nuevos. |
-| **Barra de actualización** | Ciclo semanal con cuenta regresiva; al completarse, actualiza el contenido de forma automática. Cada apertura o recarga trae los datos vigentes. |
+| **Barra de actualización** | Ciclo diario de lunes a viernes, con cuenta regresiva hasta las 08:00 (hora de Chile); en pausa sábado y domingo. Cada apertura o recarga trae los datos vigentes. |
 | **Modo de visualización** | Tema Piedra con Azul marino. Botón que alterna entre los modos Día y Noche y recuerda la selección en el navegador. |
 | **Sonido** | Señales generadas con Web Audio (sin archivos externos), con botón para silenciarlas. El navegador habilita el audio después del primer clic en la página. |
 | **Animación** | Entrada escalonada de tarjetas, contadores progresivos, barras con crecimiento animado y resaltado de folios nuevos. Se desactiva si el sistema operativo pide reducir el movimiento. |
@@ -57,9 +57,9 @@ El visor queda disponible en `https://<usuario>.github.io/Visor-Control-Proyecto
 
 ## Sincronización automática con Google Drive
 
-**Método vigente: tarea programada de Claude, cada 2 horas.** La tarea lee la carpeta `A_LIBRO_CONSTRUCCION` con el conector de Google Drive y detecta las carpetas `FOLIO N` posteriores al último folio cargado. Lee cada `folio-N.pdf`, clasifica el folio por materia y artículo según su contenido y fija el estado de la materia según el pronunciamiento. Luego carga el lote con `scripts/cargar_folios.py`, verifica el visor y publica en `main`; Vercel republica el sitio.
+**Método vigente: tarea programada de Claude, una vez al día de lunes a viernes a las 07:43 (hora de Chile); en pausa sábado y domingo.** La tarea lee la carpeta `A_LIBRO_CONSTRUCCION` con el conector de Google Drive y detecta las carpetas `FOLIO N` posteriores al último folio cargado. Lee cada `folio-N.pdf`, clasifica el folio por materia y artículo según su contenido y fija el estado de la materia según el pronunciamiento. Luego carga el lote con `scripts/cargar_folios.py`, verifica el visor y publica en `main`; Vercel republica el sitio.
 
-- Cuando no hay folios nuevos, se registra un testigo en `data/meta.json` cada 3 h o más, en la primera ejecución que cumpla ese plazo. El visor advierte en rojo si el testigo supera 6 h; esa advertencia indica que la tarea dejó de ejecutarse.
+- Cuando no hay folios nuevos, cada ejecución registra un testigo en `data/meta.json`. El visor advierte en rojo si, pasadas 2 h desde la última ejecución programada de un día hábil, no consta ese testigo; la advertencia indica que la tarea dejó de ejecutarse. El fin de semana no genera advertencia.
 - Los folios cuya clasificación sea dudosa quedan marcados *Por revisar*.
 
 **Método alternativo (inactivo): GitHub Actions + cuenta de servicio.** El flujo `sync-drive.yml` (`scripts/sync_drive.py`) solo puede ejecutarse a mano. Para reactivarlo, la cuenta dueña de la carpeta debe compartirla con una cuenta de servicio, la clave JSON debe cargarse en el secret `GDRIVE_SA_KEY` y la línea `schedule` debe descomentarse.

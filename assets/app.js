@@ -1,7 +1,22 @@
 /* Visor Control Proyecto CyD — Libro de Obra Digital (Construcción) */
 (() => {
   'use strict';
-  const PERIODO_MS = 7 * 24 * 3600 * 1000;    // ciclo de actualización: una semana
+  /* Calendario: la sincronización con Drive corre de lunes a viernes a las 07:43 (America/Santiago);
+     el visor se recarga solo a las 08:00 de esos días y queda en pausa sábado y domingo. */
+  const TZ = 'America/Santiago', SYNC_HM = [7, 43], ACT_HM = [8, 0];
+  const partesTZ = (t) => { const o = {}; new Intl.DateTimeFormat('en-US', { timeZone: TZ, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', weekday: 'short' }).formatToParts(new Date(t)).forEach((x) => { o[x.type] = x.value; }); return o; };
+  const desfaseTZ = (t) => { const p = partesTZ(t); return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - Math.floor(t / 1000) * 1000; };
+  const instanteTZ = (y, mo, d, h, mi) => { const g = Date.UTC(y, mo - 1, d, h, mi); return g - desfaseTZ(g - desfaseTZ(g)); };
+  const habilSem = (t) => !['Sat', 'Sun'].includes(partesTZ(t).weekday);
+  const hito = (desde, hm, dir) => { // próxima (dir=1) o última (dir=-1) hora hm de un día lunes a viernes
+    const p = partesTZ(desde);
+    for (let k = 0; k <= 8; k++) {
+      const base = Date.UTC(+p.year, +p.month - 1, +p.day + dir * k), d = new Date(base);
+      const t = instanteTZ(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate(), hm[0], hm[1]);
+      if (habilSem(t + 6 * 36e5) && (dir > 0 ? t > desde : t <= desde)) return t;
+    }
+    return desde + dir * 864e5;
+  };
   const ROTACION_MS = 12 * 1000;              // modo presentación: cambio de vista
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -41,7 +56,7 @@
   const fmtFecha = (iso) => { const [y, m, d] = String(iso).split('-'); return `${d}/${m}/${y}`; };
   const MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
   const fmtMes = (ym) => `${MES[+ym.slice(5, 7) - 1]} ${ym.slice(2, 4)}`;
-  const SYNC_MAX_H = 6; // horas sin sincronización antes de advertir desfase
+  const SYNC_TOL_MS = 2 * 36e5; // tolerancia tras la hora programada antes de advertir desfase
   const hoyISO = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Santiago' });
   const diasEntre = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
   const estadoClase = (e) => ({ 'Aprobado': 'st-ok', 'Cerrado': 'st-ok', 'Aprobado con condiciones': 'st-ok', 'Observado': 'st-bad', 'En revisión': 'st-warn', 'Sin pronunciamiento': 'st-warn', 'Por revisar': 'st-new' })[e] || 'st-mut';
@@ -202,25 +217,30 @@
       render();
       $$('.card, .tile, .takeaway').forEach((c) => { c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); });
       const ahora = new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      const est = $('#estado-sync'), horasSync = meta.sincronizado ? (Date.now() - Date.parse(meta.sincronizado)) / 36e5 : Infinity;
+      const est = $('#estado-sync'), esperada = hito(Date.now() - SYNC_TOL_MS, SYNC_HM, -1);
+      const desfasado = !meta.sincronizado || Date.parse(meta.sincronizado) < esperada - 30 * 6e4;
       const sync = meta.sincronizado ? ` · Drive sincronizado ${new Date(meta.sincronizado).toLocaleString('es-CL', { timeZone: 'America/Santiago' })}` : ' · Sincronización con Drive no ejecutada';
-      est.textContent = `Última actualización: ${ahora}${sync}${horasSync > SYNC_MAX_H ? ' · ATENCIÓN: registro posiblemente desfasado respecto del Libro de Obra' : ''}`;
-      est.classList.toggle('desfase', horasSync > SYNC_MAX_H);
+      est.textContent = `Última actualización: ${ahora}${sync}${desfasado ? ' · ATENCIÓN: registro posiblemente desfasado respecto del Libro de Obra' : ''}`;
+      est.classList.toggle('desfase', desfasado);
       if (state.nuevos.size) { toast(`${state.nuevos.size} folio(s) nuevo(s): ${[...state.nuevos].map((n) => 'F' + n).join(', ')}`); play('nuevo'); }
       else if (origen !== 'inicio') { toast('Contenido actualizado · sin folios nuevos'); play('ok'); }
     } catch (e) {
       $('#estado-sync').textContent = `No se pudo actualizar (${e.message}). Se mantiene la última información.`; play('error');
     } finally {
-      btn.classList.remove('spin'); state.loading = false; state.next = Date.now() + PERIODO_MS;
+      btn.classList.remove('spin'); state.loading = false; state.prev = hito(Date.now(), ACT_HM, -1); state.next = hito(Date.now(), ACT_HM, 1);
     }
   }
 
-  // Barra de actualización: ciclo semanal.
+  // Barra de actualización: ciclo diario de lunes a viernes; en pausa sábado y domingo.
   setInterval(() => {
-    const rest = Math.max(0, state.next - Date.now());
-    $('#bar-fill').style.width = `${100 * (1 - rest / PERIODO_MS)}%`;
+    if (!state.next) return;
+    const ahora = Date.now(), rest = Math.max(0, state.next - ahora), total = Math.max(1, state.next - (state.prev || ahora));
+    $('#bar-fill').style.width = `${100 * (1 - rest / total)}%`;
     const d = Math.floor(rest / 864e5), h = Math.floor((rest % 864e5) / 36e5), m = Math.floor((rest % 36e5) / 6e4);
-    $('#cuenta').textContent = `Próxima actualización automática en ${d} d ${h} h ${m} min`;
+    const pausa = !habilSem(ahora);
+    $('#cuenta').textContent = pausa
+      ? `Actualización automática en pausa (sábado y domingo) · se reanuda el lunes a las 08:00, en ${d} d ${h} h ${m} min`
+      : `Próxima actualización automática en ${d ? d + ' d ' : ''}${h} h ${m} min (lunes a viernes, 08:00)`;
     if (rest === 0 && !state.loading) actualizar('auto');
   }, 1000);
 
