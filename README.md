@@ -12,7 +12,7 @@ El visor consolida los folios intercambiados entre la Sociedad Concesionaria Des
 | **Modo documentación** | Abre en claude.ai el panel documental de la carpeta `DOCUMENTACION`, con árbol, búsqueda y filtros. |
 | **Actualizar** | Vuelve a leer `data/*.json`, recalcula los indicadores y anuncia con aviso visual y sonoro los folios nuevos. |
 | **Barra de actualización** | Ciclo semanal con cuenta regresiva; al completarse, actualiza el contenido de forma automática. Cada apertura o recarga trae los datos vigentes. |
-| **Modo de visualización** | Botón que alterna entre los modos Día, Noche y Luna y recuerda la selección en el navegador. |
+| **Modo de visualización** | Tema Piedra con Azul marino. Botón que alterna entre los modos Día y Noche y recuerda la selección en el navegador. |
 | **Sonido** | Señales generadas con Web Audio (sin archivos externos), con botón para silenciarlas. El navegador habilita el audio después del primer clic en la página. |
 | **Animación** | Entrada escalonada de tarjetas, contadores progresivos, barras con crecimiento animado y resaltado de folios nuevos. Se desactiva si el sistema operativo pide reducir el movimiento. |
 
@@ -35,7 +35,7 @@ scripts/config.json         ID de la carpeta de Drive y firmantes de cada parte
 
 ## Plazos contractuales de respuesta
 
-`data/plazos.json` recoge los plazos que las BALI (versión refundida al 21-11-2025) fijan a cada parte para pronunciarse o responder, y asigna a cada materia la regla aplicable. Con ello, el visor calcula el vencimiento de cada materia pendiente desde la fecha de su último folio y lo muestra en la tabla de acciones pendientes, en dos indicadores (plazos vencidos y plazos que vencen en 7 días o menos) y en la vista *Plazos contractuales (BALI)*.
+`data/plazos.json` recoge los plazos que las BALI (versión refundida al 21-11-2025) fijan a cada parte para pronunciarse o responder, y asigna a cada materia la regla aplicable. Con ello, el visor calcula el vencimiento de cada materia pendiente desde la fecha de su último folio y lo muestra en la tabla de acciones pendientes, en dos indicadores (plazos vencidos y plazos que vencen en 7 días o menos).
 
 - **Cómputo (art. 1.2.2 vi).** Los plazos se cuentan en días corridos, salvo que la BALI diga «días hábiles». Si el último día es inhábil, el plazo se prorroga al primer día hábil siguiente. Los festivos se registran en `festivos`.
 - **Regla general (art. 1.10.1.2.1).** Rige para ingeniería, planes, programas y documentos que se remiten a este artículo (PGS, PGHC, Topografía y Exploración Geotécnica). La IF tiene 42 días desde la primera presentación y 21 días desde cada reingreso. La SC tiene hasta 21 días para responder las observaciones.

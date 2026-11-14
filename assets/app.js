@@ -154,22 +154,6 @@
     cv.append(s, f);
   }
 
-  function drawReglas(mat) {
-    const tb = $('#t-plazos'); if (!tb) return; tb.replaceChildren();
-    const P = state.plazos || {}, reglas = P.reglas || {}, asign = P.materias || {};
-    const nombre = new Map(mat.map((m) => [m.materia_id, m.materia]));
-    const fmtP = (r) => (!r ? '—' : r.dias ? `${r.dias} días${r.habiles ? ' hábiles' : ''}` : 'No fijado');
-    Object.entries(reglas).forEach(([id, r]) => {
-      const tr = tb.insertRow();
-      cell(tr, r.nombre); cell(tr, r.articulo, 'dim');
-      const ci = cell(tr, fmtP(r.IF) + (r.IF_reingreso ? ` · reingreso ${fmtP(r.IF_reingreso)}` : '')); ci.title = [r.IF && r.IF.texto, r.IF_reingreso && r.IF_reingreso.texto].filter(Boolean).join(' ');
-      const cs = cell(tr, fmtP(r.SC)); cs.title = (r.SC && r.SC.texto) || '';
-      cell(tr, Object.entries(asign).filter(([, a]) => a.regla === id).map(([mid, a]) => (nombre.get(mid) || mid) + (a.referencial ? ' (ref.)' : '')).join('; ') || (id === 'REPOSICION' ? 'Toda orden o resolución de la IF' : '—'), 'wrap');
-      cell(tr, [r.IF && r.IF.texto, r.SC && r.SC.texto].filter(Boolean).join(' '), 'wrap');
-    });
-    const c = $('#plazos-computo'); if (c) c.textContent = P.computo || '';
-  }
-
   function drawMaterias(mat) {
     const tb = $('#t-mat'); tb.replaceChildren();
     const max = d3.max(mat, (m) => m.n_folios) || 1;
@@ -201,7 +185,7 @@
 
   function render() {
     const { respuestas, mat, kpi } = calcular();
-    drawKpis(kpi); drawPendientes(mat); drawReglas(mat); drawMaterias(mat); drawRegistro();
+    drawKpis(kpi); drawPendientes(mat); drawMaterias(mat); drawRegistro();
   }
 
   /* ---------- Carga y actualización ---------- */
@@ -249,7 +233,7 @@
   const menu = $('#menu-ver'), btnVer = $('#btn-ver');
   btnVer.addEventListener('click', () => { unlock(); play('click'); menu.hidden = !menu.hidden; btnVer.setAttribute('aria-expanded', String(!menu.hidden)); });
   document.addEventListener('click', (e) => { if (!e.target.closest('.menu')) { menu.hidden = true; btnVer.setAttribute('aria-expanded', 'false'); } });
-  const VISTAS = ['todo', 'pendientes', 'plazos', 'materias', 'registro'];
+  const VISTAS = ['todo', 'pendientes', 'materias', 'registro'];
   let rot = null;
   function setVista(v, silencio) {
     state.view = v; const mostrar = v === 'presentacion' ? VISTAS[1] : v;
