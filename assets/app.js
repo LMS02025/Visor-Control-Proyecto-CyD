@@ -28,7 +28,7 @@
     return `url(#${id})`;
   };
   const motion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const state = { folios: [], materias: [], meta: {}, plazos: {}, prevIds: null, nuevos: new Set(), sortKey: 'folio', sortDir: -1, view: 'todo', next: 0, loading: false };
+  const state = { folios: [], materias: [], meta: {}, plazos: {}, ds15: {}, prevIds: null, nuevos: new Set(), sortKey: 'folio', sortDir: -1, view: 'todo', next: 0, loading: false };
 
   /* ---------- Sonido (Web Audio, sin archivos externos) ---------- */
   const audio = { ctx: null, on: true };
@@ -145,7 +145,7 @@
     const rest = (m) => (m.plazo && m.plazo.vence ? m.plazo.restan : Infinity);
     mat.filter((m) => m.responde === 'IF' || m.responde === 'SC').sort((a, b) => rest(a) - rest(b) || b.dias_desde - a.dias_desde).forEach((m, i) => {
       const tr = tb.insertRow(); if (motion) tr.style.animation = `rise .45s ${i * 0.04}s both`;
-      cell(tr, m.materia); cell(tr, m.articulo, 'dim');
+      cell(tr, m.materia); cell(tr, m.articulo, 'dim'); drawDS(tr, m);
       badge(cell(tr, ''), parte(m.responde), m.responde === 'IF' ? 'st-if' : 'st-sc');
       badge(cell(tr, ''), m.estado);
       cell(tr, 'F' + m.ultimo_folio, 'num');
@@ -170,12 +170,28 @@
     cv.append(s, f);
   }
 
+  function drawDS(tr, m) {
+    const c = cell(tr, '', 'ds'), d = ((state.ds15 || {}).materias || {})[m.materia_id];
+    if (!d) { c.textContent = '—'; c.classList.add('dim'); return; }
+    c.title = d.texto + (d.pendiente ? ` Pendiente: ${d.pendiente}` : '');
+    const n = document.createElement('div'); n.className = 'ds-num'; n.textContent = d.numerales === '—' ? 'Remite a las BALI' : d.numerales;
+    const r = document.createElement('div'); r.className = 'ds-res'; r.textContent = d.resumen;
+    c.append(n, r);
+    if (d.pendiente) { const pe = document.createElement('div'); pe.className = 'ds-res ds-pend'; pe.textContent = 'Por verificar: ' + d.pendiente; c.appendChild(pe); }
+    if (d.hito) {
+      const rest = diasEntre(hoyISO(), d.hito.fecha), h = document.createElement('div'); h.className = 'ds-hito'; h.title = d.hito.descripcion;
+      const b = document.createElement('span'); b.className = 'dias ' + (rest < 0 ? 'd3' : rest <= 30 ? 'd2' : 'd1');
+      b.textContent = rest < 0 ? `Vencido ${-rest} d` : `${rest} d`;
+      h.append('Hito ', fmtFecha(d.hito.fecha), ' ', b); c.appendChild(h);
+    }
+  }
+
   function drawMaterias(mat) {
     const tb = $('#t-mat'); tb.replaceChildren();
     const max = d3.max(mat, (m) => m.n_folios) || 1;
     mat.forEach((m) => {
       const tr = tb.insertRow();
-      cell(tr, m.materia); cell(tr, m.articulo, 'dim'); badge(cell(tr, ''), m.estado);
+      cell(tr, m.materia); cell(tr, m.articulo, 'dim'); drawDS(tr, m); badge(cell(tr, ''), m.estado);
       const c = cell(tr, ''); const b = document.createElement('span'); b.className = 'minibar ' + estadoClase(m.estado); b.style.width = '0'; c.append(b, String(m.n_folios));
       requestAnimationFrame(() => { b.style.transition = motion ? 'width .8s cubic-bezier(.2,.8,.2,1)' : ''; b.style.width = (48 * m.n_folios / max) + 'px'; });
       cell(tr, `${fmtFecha(m.fecha_ultimo)} · F${m.ultimo_folio}`, 'dim'); cell(tr, m.situacion, 'wrap');
@@ -211,10 +227,10 @@
     const btn = $('#btn-act'); btn.classList.add('spin'); $('#estado-sync').textContent = 'Actualizando contenido…';
     if (origen !== 'inicio') play('inicio');
     try {
-      const [folios, materias, meta, plazos] = await Promise.all([getJSON('data/folios.json'), getJSON('data/materias.json'), getJSON('data/meta.json').catch(() => ({})), getJSON('data/plazos.json').catch(() => ({}))]);
+      const [folios, materias, meta, plazos, ds15] = await Promise.all([getJSON('data/folios.json'), getJSON('data/materias.json'), getJSON('data/meta.json').catch(() => ({})), getJSON('data/plazos.json').catch(() => ({})), getJSON('data/ds15.json').catch(() => ({}))]);
       const ids = new Set(folios.map((f) => +f.folio));
       state.nuevos = state.prevIds ? new Set([...ids].filter((i) => !state.prevIds.has(i))) : new Set();
-      state.prevIds = ids; state.folios = folios; state.materias = materias; state.meta = meta; state.plazos = plazos;
+      state.prevIds = ids; state.folios = folios; state.materias = materias; state.meta = meta; state.plazos = plazos; state.ds15 = ds15;
       render();
       $$('.card, .tile, .takeaway').forEach((c) => { c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); });
       const ahora = new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });

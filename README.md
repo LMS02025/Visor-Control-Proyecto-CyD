@@ -28,6 +28,7 @@ data/folios.json            Un registro por folio
 data/materias.json          Materias contractuales, estado y parte que debe responder
 data/meta.json              Fecha de la última sincronización
 data/plazos.json            Plazos de respuesta de las BALI y regla aplicable a cada materia
+data/ds15.json              Disposiciones del D.S. MOP N° 15/2026 (adjudicación) por materia, con hitos
 scripts/sync_drive.py       Sincronización Drive → data/
 scripts/config.json         ID de la carpeta de Drive y firmantes de cada parte
 .github/workflows/          Ejecución programada de la sincronización
@@ -42,6 +43,10 @@ scripts/config.json         ID de la carpeta de Drive y firmantes de cada parte
 - **Reglas especiales.** PEPID: 30/30 días (art. 1.10.1.2). PEB: 20/20 días (art. 1.10.1.4.4). Gestor BIM: 10 días (art. 1.10.1.4.1). Revisor Estructural: 15 días (art. 1.10.1.3). Peritos Tasadores: 30 días para la IF (art. 1.10.2.1.3 c). Reposición: 5 días hábiles (art. 1.15.8).
 - **Materias sin plazo propio.** Para M20 y M21 se aplica como referencia el art. 1.10.1.2.1, y el visor las rotula *(referencial)*. Para M06, M07 y M17 las BALI no fijan plazo de respuesta.
 - **Materias nuevas.** Al crear una materia, agréguela en `materias` de `plazos.json` con su regla. Si falta, el visor muestra *Sin regla asignada*.
+
+## Decreto Supremo de adjudicación (DS 15)
+
+`data/ds15.json` registra, por materia, lo que el D.S. MOP N° 15 de 2026 (Diario Oficial de 11-04-2026) agrega o precisa respecto de las BALI. Para cada materia incluye los numerales citados, un resumen y el texto de la disposición, más un hito con fecha cuando corresponde. Las tablas de acciones pendientes y de estado de materias lo muestran en la columna **DS 15**. Cuando el decreto no contiene disposición propia, la columna indica que la materia se rige por las BALI.
 
 ## Explorador documental
 
