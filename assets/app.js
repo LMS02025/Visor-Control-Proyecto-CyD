@@ -149,7 +149,8 @@
       badge(cell(tr, ''), parte(m.responde), m.responde === 'IF' ? 'st-if' : 'st-sc');
       badge(cell(tr, ''), m.estado);
       cell(tr, 'F' + m.ultimo_folio, 'num');
-      cell(tr, d3.format(',')(m.dias_desde), 'num');
+      const ct = cell(tr, d3.format(',')(m.dias_desde), 'num'); ct.title = `Contados desde F${m.ultimo_folio}, de ${fmtFecha(m.fecha_ultimo)}`;
+      const fi = document.createElement('div'); fi.className = 'dim'; fi.textContent = `desde ${fmtFecha(m.fecha_ultimo)}`; ct.appendChild(fi);
       drawPlazo(tr, m.plazo);
       cell(tr, m.situacion, 'wrap');
     });
