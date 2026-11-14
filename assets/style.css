@@ -31,7 +31,7 @@ body {
     linear-gradient(180deg, var(--bg), var(--bg2));
   background-attachment: fixed;
 }
-.app { max-width: 1440px; margin: 0 auto; padding: 28px clamp(14px, 3vw, 40px) 48px; display: flex; flex-direction: column; gap: 20px; }
+.app { max-width: 1880px; margin: 0 auto; padding: 28px clamp(12px, 2vw, 32px) 48px; display: flex; flex-direction: column; gap: 20px; }
 
 /* Encabezado */
 .top { display: flex; justify-content: space-between; align-items: center; gap: 18px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
@@ -132,7 +132,7 @@ td { padding: 9px 10px; border-bottom: 1px solid var(--line2); vertical-align: t
 tbody tr { transition: background .2s; }
 tbody tr:nth-child(even) { background: color-mix(in srgb, var(--panel2) 35%, transparent); }
 tbody tr:hover { background: color-mix(in srgb, var(--gold) 9%, transparent); }
-td.num, th.num { text-align: right; } td.dim { color: var(--muted); } td.wrap { min-width: 16rem; line-height: 1.45; }
+td.num, th.num { text-align: right; } td.dim { color: var(--muted); } td.wrap { min-width: 13rem; line-height: 1.45; }
 td a { color: var(--gold2); text-decoration: none; font-weight: 600; border-bottom: 1px solid transparent; } td a:hover { border-color: var(--gold2); }
 .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; white-space: nowrap; letter-spacing: .2px;
   color: var(--c, var(--muted)); background: color-mix(in srgb, var(--c, var(--muted)) 16%, transparent); border: 1px solid color-mix(in srgb, var(--c, var(--muted)) 45%, transparent); }
@@ -250,8 +250,11 @@ html.cambio * { transition: background-color .4s, color .4s, border-color .4s !i
 
 td.plazo { white-space: nowrap; cursor: help; }
 td .dim { font-size: 11.5px; margin-top: 3px; }
-td.ds { min-width: 13rem; max-width: 18rem; cursor: help; line-height: 1.4; }
+td.ds { min-width: 12rem; max-width: 17rem; cursor: help; line-height: 1.4; }
 .ds-num { font-weight: 600; color: var(--gold); font-size: 12px; }
 .ds-res { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
 .ds-pend { color: var(--amber); font-weight: 500; }
 .ds-hito { margin-top: 5px; font-size: 11.5px; white-space: nowrap; }
+#pendientes th, #pendientes td { padding-left: 8px; padding-right: 8px; }
+#pendientes th { white-space: normal; vertical-align: bottom; }
+#pendientes td.wrap { min-width: 11rem; } #pendientes td.ds { min-width: 11rem; }
