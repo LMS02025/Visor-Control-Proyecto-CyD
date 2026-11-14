@@ -92,13 +92,13 @@ body {
 b.warn { color: var(--amber) !important; } b.bad { color: var(--ruby) !important; }
 
 /* Indicadores: un tono joya por tarjeta */
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
 .tile { --c: var(--sapphire); position: relative; overflow: hidden; border-radius: var(--radius); padding: 16px 18px 18px; border: 1px solid color-mix(in srgb, var(--c) 35%, transparent);
   background: linear-gradient(150deg, color-mix(in srgb, var(--c) 22%, var(--panel-solid)), var(--panel-solid) 70%); box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; }
 .tile:hover { transform: translateY(-3px); box-shadow: 0 22px 40px -18px color-mix(in srgb, var(--c) 55%, transparent); }
 .tile::after { content: ""; position: absolute; right: -30px; top: -30px; width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(color-mix(in srgb, var(--c) 40%, transparent), transparent 70%); }
 .tiles .tile:nth-child(1) { --c: var(--sapphire); } .tiles .tile:nth-child(2) { --c: var(--teal); } .tiles .tile:nth-child(3) { --c: var(--violet); }
-.tiles .tile:nth-child(4) { --c: var(--amber); } .tiles .tile:nth-child(5) { --c: var(--ruby); } .tiles .tile:nth-child(6) { --c: var(--emerald); }
+.tiles .tile:nth-child(4) { --c: var(--amber); } .tiles .tile:nth-child(5) { --c: var(--ruby); } .tiles .tile:nth-child(6) { --c: var(--rose); } .tiles .tile:nth-child(7) { --c: var(--gold); } .tiles .tile:nth-child(8) { --c: var(--emerald); }
 .tile .lbl { color: var(--muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 500; }
 .tile .val { font-family: var(--serif); font-weight: 600; font-size: 46px; line-height: 1; margin: 10px 0 6px; font-variant-numeric: lining-nums tabular-nums; color: color-mix(in srgb, var(--c) 55%, var(--fg)); }
 .tile .val small { font-family: var(--sans); font-size: 13px; color: var(--muted); font-weight: 400; }
@@ -245,3 +245,6 @@ html.cambio * { transition: background-color .4s, color .4s, border-color .4s !i
 .card { border-top-width: 6px; }
 .card h2::after { height: 4px; width: 72px; }
 .menu-list button:hover, .menu-list button[aria-checked="true"] { color: var(--gold); }
+
+td.plazo { white-space: nowrap; cursor: help; }
+td .dim { font-size: 11.5px; margin-top: 3px; }

@@ -1,0 +1,84 @@
+{
+ "fuente": "Bases de Licitación «Concesión Planta Desaladora para la Región de Coquimbo», versión refundida al 21-11-2025.",
+ "computo": "Art. 1.2.2 vi): «días» sin otra calificación son días corridos; «días hábiles» son de lunes a viernes, excluidos festivos. Si el último día de un plazo es inhábil, se prorroga al primer día hábil siguiente. El plazo se cuenta desde el día siguiente a la fecha del folio que lo origina (art. 1.15.8: el acto se entiende notificado cuando consta en el Libro de Obras).",
+ "festivos": ["2026-12-08", "2026-12-25", "2027-01-01", "2027-03-26", "2027-03-27", "2027-05-01", "2027-05-21", "2027-06-21", "2027-06-28", "2027-07-16", "2027-08-15", "2027-09-18", "2027-09-19", "2027-10-11", "2027-11-01", "2027-12-08", "2027-12-25"],
+ "reglas": {
+  "ING": {
+   "nombre": "Procedimiento general de aprobación (ingeniería, planes, programas y otros documentos)",
+   "articulo": "Art. 1.10.1.2.1",
+   "IF": {"dias": 42, "habiles": false, "texto": "La IF tiene un plazo máximo de 42 días desde la presentación para aprobar o pronunciarse."},
+   "IF_reingreso": {"dias": 21, "habiles": false, "texto": "Presentadas las respuestas a las observaciones, la IF debe pronunciarse en el plazo máximo de 21 días."},
+   "SC": {"dias": 21, "habiles": false, "texto": "La IF fija en cada caso el plazo de respuesta de la SC, que no puede exceder de 21 días cada vez."}
+  },
+  "PEPID": {
+   "nombre": "Programa de Ejecución del Proyecto de Ingeniería Definitiva",
+   "articulo": "Art. 1.10.1.2",
+   "IF": {"dias": 30, "habiles": false, "texto": "La IF tiene un plazo máximo de 30 días desde la presentación del PEPID para aprobarlo u observarlo (la DOH dispone de 30 días desde que se le solicita)."},
+   "SC": {"dias": 30, "habiles": false, "texto": "La SC debe subsanar las observaciones en el plazo máximo de 30 días."}
+  },
+  "PEB": {
+   "nombre": "Plan de Ejecución BIM",
+   "articulo": "Art. 1.10.1.4.4",
+   "IF": {"dias": 20, "habiles": false, "texto": "La IF tiene 20 días para revisar el PEB y 20 días como máximo para pronunciarse sobre cada versión corregida."},
+   "SC": {"dias": 20, "habiles": false, "texto": "La SC dispone de 20 días para responder la totalidad de las observaciones y entregar una versión corregida."}
+  },
+  "BIM_INF": {
+   "nombre": "Informe mensual Estado del Arte de los Usos BIM",
+   "articulo": "Art. 1.10.1.4.3",
+   "IF": {"dias": 15, "habiles": false, "texto": "La IF tiene 15 días para revisar el informe; las observaciones se atienden en el informe mensual siguiente."}
+  },
+  "GESTOR_BIM": {
+   "nombre": "Gestor BIM",
+   "articulo": "Art. 1.10.1.4.1",
+   "IF": {"dias": 10, "habiles": false, "texto": "La IF tiene 10 días para aprobar la proposición o rechazarla fundadamente, e idéntico plazo para la nueva proposición."},
+   "SC": {"dias": 10, "habiles": false, "texto": "Rechazada la proposición, la SC debe presentar una nueva dentro de los 10 días siguientes."}
+  },
+  "REV_EST": {
+   "nombre": "Revisor Estructural Independiente",
+   "articulo": "Art. 1.10.1.3",
+   "IF": {"dias": 15, "habiles": false, "texto": "La IF tiene 15 días para aprobar la proposición o rechazarla fundadamente, e idéntico plazo para la nueva proposición."},
+   "SC": {"dias": 15, "habiles": false, "texto": "Rechazada la proposición, la SC debe presentar una nueva dentro de los 15 días siguientes."}
+  },
+  "PERITOS": {
+   "nombre": "Comisión de Peritos Tasadores",
+   "articulo": "Art. 1.10.2.1.3 c)",
+   "IF": {"dias": 30, "habiles": false, "texto": "La IF debe informar por escrito los 3 peritos escogidos dentro de 30 días desde la entrega de la propuesta de 6 peritos."}
+  },
+  "EQUIPO": {
+   "nombre": "Equipo profesional del Concesionario",
+   "articulo": "Art. 1.7.11",
+   "IF": {"dias": null, "texto": "Las BALI no fijan plazo a la IF para pronunciarse sobre la experiencia acreditada. La SC debe presentar los antecedentes al menos 15 días antes del nombramiento e informar cada nombramiento dentro de 5 días (15 días para Gerente General y Gerente Técnico)."},
+   "SC": {"dias": null, "texto": "Sin plazo de respuesta fijado en las BALI; rige el que determine la IF."}
+  },
+  "OFERTA": {
+   "nombre": "Modificaciones a la oferta técnica",
+   "articulo": "Art. 1.9.1.2.1",
+   "IF": {"dias": null, "texto": "Las BALI no fijan plazo de pronunciamiento para la propuesta de modificación de la oferta técnica."},
+   "SC": {"dias": null, "texto": "Sin plazo de respuesta fijado en las BALI; la propuesta no puede afectar los plazos de tramitación del EIA de la PDAM."}
+  },
+  "REPOSICION": {
+   "nombre": "Recurso de reposición contra órdenes o resoluciones de la IF",
+   "articulo": "Art. 1.15.8",
+   "IF": {"dias": 5, "habiles": true, "texto": "La IF se pronuncia dentro de los 5 días hábiles siguientes a la recepción del recurso."},
+   "SC": {"dias": 5, "habiles": true, "texto": "La SC puede interponer reposición dentro de los 5 días hábiles siguientes a la notificación; resuelta, puede recurrir al DGC dentro de 3 días hábiles."}
+  }
+ },
+ "materias": {
+  "M06": {"regla": "EQUIPO"},
+  "M07": {"regla": "EQUIPO"},
+  "M08": {"regla": "PEPID"},
+  "M09": {"regla": "ING", "nota": "Proyectos de Ingeniería de Detalle, Fase 1 (art. 1.10.1.2.1)."},
+  "M10": {"regla": "GESTOR_BIM"},
+  "M11": {"regla": "PEB"},
+  "M12": {"regla": "REV_EST"},
+  "M13": {"regla": "ING", "nota": "El art. 1.9.1.5.1 remite al art. 1.10.1.2.1."},
+  "M14": {"regla": "ING", "nota": "El art. 1.9.1.3.1 remite al art. 1.10.1.2.1."},
+  "M15": {"regla": "ING", "nota": "Equipo del PGS (art. 1.9.1.3.1 v), que remite al art. 1.10.1.2.1."},
+  "M17": {"regla": "OFERTA"},
+  "M18": {"regla": "ING", "nota": "El art. 2.2.2.2.1 f) remite al art. 1.10.1.2.1."},
+  "M19": {"regla": "ING", "nota": "El art. 2.2.2.2.3 remite al art. 1.10.1.2.1; la IF exige la nueva versión «dentro de los plazos contractuales» (F90)."},
+  "M20": {"regla": "ING", "referencial": true, "nota": "El art. 2.2.2.2.4 no fija plazo; se aplica como referencia el art. 1.10.1.2.1. El F91 no fija plazo a la SC."},
+  "M21": {"regla": "ING", "referencial": true, "nota": "El art. 2.2.2.4.2 no fija plazo; se aplica como referencia el art. 1.10.1.2.1."},
+  "M22": {"regla": "PERITOS", "nota": "Se computa desde la última propuesta corregida."}
+ }
+}

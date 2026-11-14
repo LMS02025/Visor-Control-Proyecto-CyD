@@ -27,10 +27,21 @@ vendor/d3.min.js            d3 v7
 data/folios.json            Un registro por folio
 data/materias.json          Materias contractuales, estado y parte que debe responder
 data/meta.json              Fecha de la última sincronización
+data/plazos.json            Plazos de respuesta de las BALI y regla aplicable a cada materia
 scripts/sync_drive.py       Sincronización Drive → data/
 scripts/config.json         ID de la carpeta de Drive y firmantes de cada parte
 .github/workflows/          Ejecución programada de la sincronización
 ```
+
+## Plazos contractuales de respuesta
+
+`data/plazos.json` recoge los plazos que las BALI (versión refundida al 21-11-2025) fijan a cada parte para pronunciarse o responder, y asigna a cada materia la regla aplicable. Con ello, el visor calcula el vencimiento de cada materia pendiente desde la fecha de su último folio y lo muestra en la tabla de acciones pendientes, en dos indicadores (plazos vencidos y plazos que vencen en 7 días o menos) y en la vista *Plazos contractuales (BALI)*.
+
+- **Cómputo (art. 1.2.2 vi).** Los plazos se cuentan en días corridos, salvo que la BALI diga «días hábiles». Si el último día es inhábil, el plazo se prorroga al primer día hábil siguiente. Los festivos se registran en `festivos`.
+- **Regla general (art. 1.10.1.2.1).** Rige para ingeniería, planes, programas y documentos que se remiten a este artículo (PGS, PGHC, Topografía y Exploración Geotécnica). La IF tiene 42 días desde la primera presentación y 21 días desde cada reingreso. La SC tiene hasta 21 días para responder las observaciones.
+- **Reglas especiales.** PEPID: 30/30 días (art. 1.10.1.2). PEB: 20/20 días (art. 1.10.1.4.4). Gestor BIM: 10 días (art. 1.10.1.4.1). Revisor Estructural: 15 días (art. 1.10.1.3). Peritos Tasadores: 30 días para la IF (art. 1.10.2.1.3 c). Reposición: 5 días hábiles (art. 1.15.8).
+- **Materias sin plazo propio.** Para M20 y M21 se aplica como referencia el art. 1.10.1.2.1, y el visor las rotula *(referencial)*. Para M06, M07 y M17 las BALI no fijan plazo de respuesta.
+- **Materias nuevas.** Al crear una materia, agréguela en `materias` de `plazos.json` con su regla. Si falta, el visor muestra *Sin regla asignada*.
 
 ## Explorador documental
 

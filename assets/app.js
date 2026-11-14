@@ -13,7 +13,7 @@
     return `url(#${id})`;
   };
   const motion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const state = { folios: [], materias: [], meta: {}, prevIds: null, nuevos: new Set(), sortKey: 'folio', sortDir: -1, view: 'todo', next: 0, loading: false };
+  const state = { folios: [], materias: [], meta: {}, plazos: {}, prevIds: null, nuevos: new Set(), sortKey: 'folio', sortDir: -1, view: 'todo', next: 0, loading: false };
 
   /* ---------- Sonido (Web Audio, sin archivos externos) ---------- */
   const audio = { ctx: null, on: true };
@@ -48,6 +48,25 @@
   const parte = (r) => ({ IF: 'Inspección Fiscal', SC: 'Sociedad Concesionaria' })[r] || r;
   const cell = (tr, txt, cls) => { const c = tr.insertCell(); c.textContent = txt; if (cls) c.className = cls; return c; };
   const badge = (td, txt, cls) => { const s = document.createElement('span'); s.className = 'badge ' + (cls || estadoClase(txt)); s.textContent = txt; td.appendChild(s); };
+  /* Cómputo de plazos BALI (art. 1.2.2 vi): días corridos con prórroga al día hábil siguiente, o días hábiles. */
+  const sumaDias = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+  const esHabil = (iso, fest) => { const w = new Date(iso + 'T12:00:00Z').getUTCDay(); return w !== 0 && w !== 6 && !fest.has(iso); };
+  const vencimiento = (iso, n, habiles, fest) => {
+    let d = iso;
+    if (habiles) { let k = 0; while (k < n) { d = sumaDias(d, 1); if (esHabil(d, fest)) k++; } return d; }
+    d = sumaDias(d, n); while (!esHabil(d, fest)) d = sumaDias(d, 1); return d;
+  };
+  function plazoDe(m, fs, corte) {
+    const P = state.plazos || {}, cfg = (P.materias || {})[m.materia_id], regla = cfg && (P.reglas || {})[cfg.regla];
+    if (!regla || (m.responde !== 'IF' && m.responde !== 'SC')) return null;
+    const last = fs.reduce((a, b) => (+b.folio > +a.folio ? b : a));
+    const reingreso = m.responde === 'IF' && regla.IF_reingreso && fs.some((f) => f.emisor === 'IF' && +f.folio < +last.folio);
+    const r = (reingreso ? regla.IF_reingreso : regla[m.responde]) || {};
+    const base = { regla: cfg.regla, articulo: regla.articulo, nombre: regla.nombre, texto: r.texto || '', nota: cfg.nota || '', referencial: !!cfg.referencial, reingreso, desde: last.fecha, folio: +last.folio };
+    if (!r.dias) return { ...base, dias: null };
+    const vence = vencimiento(last.fecha, r.dias, !!r.habiles, new Set(P.festivos || []));
+    return { ...base, dias: r.dias, habiles: !!r.habiles, vence, restan: diasEntre(corte, vence) };
+  }
   const median = (xs) => (xs.length ? (xs[(xs.length - 1) >> 1] + xs[xs.length >> 1]) / 2 : null);
 
   const tip = $('#tip');
@@ -77,7 +96,7 @@
     const mat = materias.map((m) => {
       const fs = folios.filter((f) => f.materia_id === m.materia_id);
       const last = fs.reduce((a, b) => (+b.folio > +a.folio ? b : a), fs[0] || { folio: 0, fecha: corte });
-      return { ...m, n_folios: fs.length, ultimo_folio: +last.folio, fecha_ultimo: last.fecha, dias_desde: diasEntre(last.fecha, corte) };
+      return { ...m, n_folios: fs.length, ultimo_folio: +last.folio, fecha_ultimo: last.fecha, dias_desde: diasEntre(last.fecha, corte), plazo: fs.length ? plazoDe(m, fs, corte) : null };
     }).filter((m) => m.n_folios > 0);
     const dias = (p) => respuestas.filter((r) => r.responde === p).map((r) => r.dias).sort((a, b) => a - b);
     const fechas = folios.map((f) => f.fecha).sort();
@@ -86,6 +105,8 @@
       sc: folios.filter((f) => f.emisor === 'SC').length, if_: folios.filter((f) => f.emisor === 'IF').length,
       pend_if: mat.filter((m) => m.responde === 'IF').length, pend_sc: mat.filter((m) => m.responde === 'SC').length,
       med_resp_if: median(dias('IF')), med_resp_sc: median(dias('SC')),
+      venc: mat.filter((m) => m.plazo && m.plazo.vence && m.plazo.restan < 0).length,
+      prox: mat.filter((m) => m.plazo && m.plazo.vence && m.plazo.restan >= 0 && m.plazo.restan <= 7).length,
     };
     return { respuestas, mat, kpi };
   }
@@ -106,15 +127,47 @@
 
   function drawPendientes(mat) {
     const tb = $('#t-pend'); tb.replaceChildren();
-    mat.filter((m) => m.responde === 'IF' || m.responde === 'SC').sort((a, b) => b.dias_desde - a.dias_desde).forEach((m, i) => {
+    const rest = (m) => (m.plazo && m.plazo.vence ? m.plazo.restan : Infinity);
+    mat.filter((m) => m.responde === 'IF' || m.responde === 'SC').sort((a, b) => rest(a) - rest(b) || b.dias_desde - a.dias_desde).forEach((m, i) => {
       const tr = tb.insertRow(); if (motion) tr.style.animation = `rise .45s ${i * 0.04}s both`;
       cell(tr, m.materia); cell(tr, m.articulo, 'dim');
       badge(cell(tr, ''), parte(m.responde), m.responde === 'IF' ? 'st-if' : 'st-sc');
       badge(cell(tr, ''), m.estado);
       cell(tr, 'F' + m.ultimo_folio, 'num');
-      const cd = cell(tr, '', 'num'); const p = document.createElement('span'); p.className = 'dias ' + (m.dias_desde > 30 ? 'd3' : m.dias_desde > 14 ? 'd2' : 'd1'); p.textContent = d3.format(',')(m.dias_desde); cd.appendChild(p);
+      cell(tr, d3.format(',')(m.dias_desde), 'num');
+      drawPlazo(tr, m.plazo);
       cell(tr, m.situacion, 'wrap');
     });
+  }
+
+  function drawPlazo(tr, p) {
+    const cp = cell(tr, '', 'plazo'), cv = cell(tr, '', 'num');
+    if (!p) { cp.textContent = 'Sin regla asignada'; cp.className = 'dim'; cv.textContent = '—'; return; }
+    cp.title = [p.texto, p.nota].filter(Boolean).join(' ');
+    const art = document.createElement('div'); art.className = 'dim'; art.textContent = p.articulo + (p.referencial ? ' (referencial)' : '');
+    if (!p.dias) { cp.append('Sin plazo en BALI', art); cv.textContent = '—'; return; }
+    cp.append(`${p.dias} días${p.habiles ? ' hábiles' : ''}${p.reingreso ? ' (reingreso)' : ''}`, art);
+    cv.title = `Desde F${p.folio} (${fmtFecha(p.desde)}). ${p.texto}`;
+    const s = document.createElement('span'); s.className = 'dias ' + (p.restan < 0 ? 'd3' : p.restan <= 7 ? 'd2' : 'd1');
+    s.textContent = p.restan < 0 ? `Vencido ${-p.restan} d` : p.restan === 0 ? 'Vence hoy' : `${p.restan} d`;
+    const f = document.createElement('div'); f.className = 'dim'; f.textContent = fmtFecha(p.vence);
+    cv.append(s, f);
+  }
+
+  function drawReglas(mat) {
+    const tb = $('#t-plazos'); if (!tb) return; tb.replaceChildren();
+    const P = state.plazos || {}, reglas = P.reglas || {}, asign = P.materias || {};
+    const nombre = new Map(mat.map((m) => [m.materia_id, m.materia]));
+    const fmtP = (r) => (!r ? '—' : r.dias ? `${r.dias} días${r.habiles ? ' hábiles' : ''}` : 'No fijado');
+    Object.entries(reglas).forEach(([id, r]) => {
+      const tr = tb.insertRow();
+      cell(tr, r.nombre); cell(tr, r.articulo, 'dim');
+      const ci = cell(tr, fmtP(r.IF) + (r.IF_reingreso ? ` · reingreso ${fmtP(r.IF_reingreso)}` : '')); ci.title = [r.IF && r.IF.texto, r.IF_reingreso && r.IF_reingreso.texto].filter(Boolean).join(' ');
+      const cs = cell(tr, fmtP(r.SC)); cs.title = (r.SC && r.SC.texto) || '';
+      cell(tr, Object.entries(asign).filter(([, a]) => a.regla === id).map(([mid, a]) => (nombre.get(mid) || mid) + (a.referencial ? ' (ref.)' : '')).join('; ') || (id === 'REPOSICION' ? 'Toda orden o resolución de la IF' : '—'), 'wrap');
+      cell(tr, [r.IF && r.IF.texto, r.SC && r.SC.texto].filter(Boolean).join(' '), 'wrap');
+    });
+    const c = $('#plazos-computo'); if (c) c.textContent = P.computo || '';
   }
 
   function drawMaterias(mat) {
@@ -148,7 +201,7 @@
 
   function render() {
     const { respuestas, mat, kpi } = calcular();
-    drawKpis(kpi); drawPendientes(mat); drawMaterias(mat); drawRegistro();
+    drawKpis(kpi); drawPendientes(mat); drawReglas(mat); drawMaterias(mat); drawRegistro();
   }
 
   /* ---------- Carga y actualización ---------- */
@@ -158,10 +211,10 @@
     const btn = $('#btn-act'); btn.classList.add('spin'); $('#estado-sync').textContent = 'Actualizando contenido…';
     if (origen !== 'inicio') play('inicio');
     try {
-      const [folios, materias, meta] = await Promise.all([getJSON('data/folios.json'), getJSON('data/materias.json'), getJSON('data/meta.json').catch(() => ({}))]);
+      const [folios, materias, meta, plazos] = await Promise.all([getJSON('data/folios.json'), getJSON('data/materias.json'), getJSON('data/meta.json').catch(() => ({})), getJSON('data/plazos.json').catch(() => ({}))]);
       const ids = new Set(folios.map((f) => +f.folio));
       state.nuevos = state.prevIds ? new Set([...ids].filter((i) => !state.prevIds.has(i))) : new Set();
-      state.prevIds = ids; state.folios = folios; state.materias = materias; state.meta = meta;
+      state.prevIds = ids; state.folios = folios; state.materias = materias; state.meta = meta; state.plazos = plazos;
       render();
       $$('.card, .tile, .takeaway').forEach((c) => { c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); });
       const ahora = new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -196,7 +249,7 @@
   const menu = $('#menu-ver'), btnVer = $('#btn-ver');
   btnVer.addEventListener('click', () => { unlock(); play('click'); menu.hidden = !menu.hidden; btnVer.setAttribute('aria-expanded', String(!menu.hidden)); });
   document.addEventListener('click', (e) => { if (!e.target.closest('.menu')) { menu.hidden = true; btnVer.setAttribute('aria-expanded', 'false'); } });
-  const VISTAS = ['todo', 'pendientes', 'materias', 'registro'];
+  const VISTAS = ['todo', 'pendientes', 'plazos', 'materias', 'registro'];
   let rot = null;
   function setVista(v, silencio) {
     state.view = v; const mostrar = v === 'presentacion' ? VISTAS[1] : v;

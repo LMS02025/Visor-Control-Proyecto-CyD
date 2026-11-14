@@ -27,6 +27,7 @@
         <div class="menu-list" id="menu-ver" role="menu" hidden>
           <button role="menuitemradio" data-view="todo" aria-checked="true">Todo el panel</button>
           <button role="menuitemradio" data-view="pendientes" aria-checked="false">Acciones pendientes</button>
+          <button role="menuitemradio" data-view="plazos" aria-checked="false">Plazos contractuales (BALI)</button>
           <button role="menuitemradio" data-view="materias" aria-checked="false">Estado de materias</button>
           <button role="menuitemradio" data-view="registro" aria-checked="false">Registro de folios</button>
           <button role="menuitemradio" data-view="presentacion" aria-checked="false">Modo presentación (rotativo)</button>
@@ -54,7 +55,7 @@
 
   <main id="vistas">
     <section class="takeaway card-in" data-views="todo pendientes">
-      <p>Al <b data-k="corte">—</b> (fecha de corte), el libro registra <b data-k="total">—</b> folios; el último fue emitido el <b data-k="ultima">—</b>. <b class="warn" data-k="pend_if">—</b> materias esperan pronunciamiento de la Inspección Fiscal y <b class="bad" data-k="pend_sc">—</b> esperan respuesta de la Sociedad Concesionaria.</p>
+      <p>Al <b data-k="corte">—</b> (fecha de corte), el libro registra <b data-k="total">—</b> folios; el último fue emitido el <b data-k="ultima">—</b>. <b class="warn" data-k="pend_if">—</b> materias esperan pronunciamiento de la Inspección Fiscal y <b class="bad" data-k="pend_sc">—</b> esperan respuesta de la Sociedad Concesionaria. Conforme a las BALI, <b class="bad" data-k="venc">—</b> plazos de respuesta están vencidos y <b class="warn" data-k="prox">—</b> vencen dentro de los próximos 7 días.</p>
     </section>
 
     <section class="tiles" data-views="todo pendientes">
@@ -63,15 +64,26 @@
       <div class="tile"><div class="lbl">Emitidos por la IF</div><div class="val" data-k="if_">—</div><div class="note">Inspección Fiscal (titular y subrogante)</div></div>
       <div class="tile warn"><div class="lbl">Pendientes de la IF</div><div class="val" data-k="pend_if">—</div><div class="note">Presentaciones sin pronunciamiento</div></div>
       <div class="tile bad"><div class="lbl">Pendientes de la SC</div><div class="val" data-k="pend_sc">—</div><div class="note">Observaciones por subsanar</div></div>
+      <div class="tile"><div class="lbl">Plazos BALI vencidos</div><div class="val" data-k="venc">—</div><div class="note">Materias pendientes con plazo contractual expirado</div></div>
+      <div class="tile"><div class="lbl">Vencen en ≤ 7 días</div><div class="val" data-k="prox">—</div><div class="note">Plazos contractuales próximos a expirar</div></div>
       <div class="tile"><div class="lbl">Respuesta IF (mediana)</div><div class="val"><span data-k="med_resp_if">—</span><small> días</small></div><div class="note">SC: <span data-k="med_resp_sc">—</span> días de mediana</div></div>
     </section>
 
     <section class="card" id="pendientes" data-views="todo pendientes">
       <h2>Materias con acción pendiente</h2>
-      <p class="hint">Materias cuyo último folio deja la gestión en manos de una de las partes, ordenadas por días corridos desde el último movimiento.</p>
+      <p class="hint">Materias cuyo último folio deja la gestión en manos de una de las partes, ordenadas por proximidad del vencimiento del plazo contractual de respuesta (BALI), contado desde ese folio. Pase el cursor sobre el plazo para ver su fundamento.</p>
       <div class="tablewrap"><table>
-        <thead><tr><th>Materia</th><th>Artículo BALI</th><th>Debe responder</th><th>Estado</th><th class="num">Último folio</th><th class="num">Días</th><th>Situación</th></tr></thead>
+        <thead><tr><th>Materia</th><th>Artículo BALI</th><th>Debe responder</th><th>Estado</th><th class="num">Último folio</th><th class="num">Días transcurridos</th><th>Plazo BALI</th><th class="num">Vencimiento</th><th>Situación</th></tr></thead>
         <tbody id="t-pend"></tbody>
+      </table></div>
+    </section>
+
+    <section class="card" id="plazos" data-views="todo plazos">
+      <h2>Plazos contractuales de respuesta (BALI)</h2>
+      <p class="hint" id="plazos-computo"></p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Procedimiento</th><th>Artículo BALI</th><th>Plazo IF</th><th>Plazo SC</th><th>Materias a las que se aplica</th><th>Disposición</th></tr></thead>
+        <tbody id="t-plazos"></tbody>
       </table></div>
     </section>
 
@@ -102,7 +114,7 @@
   </main>
 
   <footer class="foot">
-    Fuente: carpeta A_LIBRO_CONSTRUCCION en Google Drive (PDF del Sistema de Gestión de Contratos), sincronizada con este repositorio. La materia y el estado de cada folio se asignaron por lectura del asunto, sus referencias y el pronunciamiento; los folios nuevos heredan la materia del folio que citan y quedan marcados para revisión. Plazos en días corridos.
+    Fuente: carpeta A_LIBRO_CONSTRUCCION en Google Drive (PDF del Sistema de Gestión de Contratos), sincronizada con este repositorio. La materia y el estado de cada folio se asignaron por lectura del asunto, sus referencias y el pronunciamiento; los folios nuevos heredan la materia del folio que citan y quedan marcados para revisión. Plazos de respuesta según las BALI (versión refundida 21-11-2025), en días corridos salvo indicación de días hábiles, con prórroga al día hábil siguiente cuando vencen en día inhábil (art. 1.2.2 vi). El plazo efectivo puede diferir si la IF fija uno menor en el folio respectivo.
   </footer>
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
