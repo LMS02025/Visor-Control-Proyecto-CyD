@@ -230,7 +230,9 @@
 
   function rotuloVer() {
     const b = $(`#menu-ver [data-view="${state.view}"]`);
-    $('#ver-actual').textContent = (b ? b.textContent.replace(/ \(.*\)/, '') : '') + (state.esp ? ' · ' + espNombre(state.esp) : '');
+    $('#ver-actual').textContent = b ? b.textContent.replace(/ \(.*\)/, '') : '';
+    $('#esp-actual').textContent = state.esp ? espNombre(state.esp) : 'Todas';
+    $('#btn-esp').classList.toggle('activo', !!state.esp);
     $$('#menu-esp [data-esp]').forEach((x) => x.setAttribute('aria-checked', String(x.dataset.esp === state.esp)));
   }
   function setEsp(id) {
@@ -244,7 +246,7 @@
     opc.forEach((e) => {
       const n = e.id ? state.materias.filter((m) => espDe(m.materia_id) === e.id).length : state.materias.length;
       const b = document.createElement('button'); b.setAttribute('role', 'menuitemradio'); b.dataset.esp = e.id; b.textContent = `${e.nombre} (${n})`; if (e.funcion) b.title = `TDR AIF, cargo ${e.tdr}: ${e.funcion}`;
-      b.addEventListener('click', () => { $('#menu-ver').hidden = true; setEsp(e.id); });
+      b.addEventListener('click', () => { cerrarMenus(); setEsp(e.id); });
       cont.appendChild(b);
     });
   }
@@ -298,9 +300,15 @@
     unlock(); audio.on = !audio.on; e.currentTarget.setAttribute('aria-pressed', String(audio.on));
     e.currentTarget.title = audio.on ? 'Sonido activado' : 'Sonido desactivado'; if (audio.on) play('click');
   });
-  const menu = $('#menu-ver'), btnVer = $('#btn-ver');
-  btnVer.addEventListener('click', () => { unlock(); play('click'); menu.hidden = !menu.hidden; btnVer.setAttribute('aria-expanded', String(!menu.hidden)); });
-  document.addEventListener('click', (e) => { if (!e.target.closest('.menu')) { menu.hidden = true; btnVer.setAttribute('aria-expanded', 'false'); } });
+  // Dos menús independientes: Visualizar (vistas) y Especialidad (filtro).
+  const MENUS = [['#btn-ver', '#menu-ver'], ['#btn-esp', '#menu-esp-list']];
+  function cerrarMenus(excepto) { MENUS.forEach(([b, m]) => { if (m === excepto) return; $(m).hidden = true; $(b).setAttribute('aria-expanded', 'false'); }); }
+  MENUS.forEach(([b, m]) => $(b).addEventListener('click', () => {
+    unlock(); play('click'); cerrarMenus(m); const l = $(m); l.hidden = !l.hidden; $(b).setAttribute('aria-expanded', String(!l.hidden));
+  }));
+  document.addEventListener('click', (e) => { if (!e.target.closest('.menu')) cerrarMenus(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarMenus(); });
+  const menu = $('#menu-ver');
   const VISTAS = ['todo', 'pendientes', 'materias', 'registro'];
   let rot = null;
   function setVista(v, silencio) {

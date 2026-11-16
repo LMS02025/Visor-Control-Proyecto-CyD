@@ -8,12 +8,13 @@ El visor consolida los folios intercambiados entre la Sociedad Concesionaria Des
 
 | Elemento | Descripción |
 |---|---|
-| **Visualizar** | Menú de vistas: panel completo, acciones pendientes, estado de materias, registro de folios y modo presentación (rotación automática cada 12 s). Incluye el filtro **por especialidad**, que se aplica a indicadores, tablas y registro. |
+| **Visualizar** | Menú de vistas: panel completo, acciones pendientes, estado de materias, registro de folios y modo presentación (rotación automática cada 12 s). |
+| **Especialidad** | Botón propio, separado de Visualizar, que filtra indicadores, tablas y registro por la especialidad de la Asesoría según el TDR AIF. Con un filtro activo, el botón cambia de color y muestra la especialidad elegida. |
 | **Profundidad** | Los indicadores y los botones se inclinan en 3D según la posición del cursor y se hunden al pulsarlos. Las opciones del menú Visualizar sobresalen levemente al recorrerlas. Se desactiva si el sistema pide reducir el movimiento. |
 | **Modo documentación** | Abre en claude.ai el panel documental de la carpeta `DOCUMENTACION`, con árbol, búsqueda y filtros. |
 | **Actualizar** | Vuelve a leer `data/*.json`, recalcula los indicadores y anuncia con aviso visual y sonoro los folios nuevos. |
 | **Barra de actualización** | Ciclo diario de lunes a viernes, con cuenta regresiva hasta las 08:00 (hora de Chile); en pausa sábado y domingo. Cada apertura o recarga trae los datos vigentes. |
-| **Modo de visualización** | Tema Piedra con Azul marino. Botón que alterna entre los modos Día y Noche y recuerda la selección en el navegador. |
+| **Modo de visualización** | Tema Piedra con Azul marino con estilo iOS: tipografía del sistema (SF Pro en dispositivos Apple; Inter como alternativa), cifras en SF Rounded, materiales translúcidos, botones en cápsula, menús contextuales e iconos tipo SF Symbols. Botón que alterna entre los modos Día y Noche y recuerda la selección en el navegador. |
 | **Sonido** | Señales generadas con Web Audio (sin archivos externos), con botón para silenciarlas. El navegador habilita el audio después del primer clic en la página. |
 | **Animación** | Entrada escalonada de tarjetas, contadores progresivos, barras con crecimiento animado y resaltado de folios nuevos. Se desactiva si el sistema operativo pide reducir el movimiento. |
 
@@ -30,7 +31,7 @@ data/folios.json            Un registro por folio
 data/materias.json          Materias contractuales, estado y parte que debe responder
 data/meta.json              Fecha de la última sincronización
 data/plazos.json            Plazos de respuesta de las BALI y regla aplicable a cada materia
-data/especialidades.json    Especialidades según los cargos del TDR de la AIF (filtro del menú Visualizar)
+data/especialidades.json    Especialidades según los cargos del TDR de la AIF (filtro Especialidad)
 data/ds15.json              Disposiciones del D.S. MOP N° 15/2026 (adjudicación) por materia, con hitos
 scripts/sync_drive.py       Sincronización Drive → data/
 scripts/config.json         ID de la carpeta de Drive y firmantes de cada parte
