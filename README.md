@@ -8,8 +8,8 @@ El visor consolida los folios intercambiados entre la Sociedad Concesionaria Des
 
 | Elemento | Descripción |
 |---|---|
-| **Visualizar** | Menú de vistas: panel completo, acciones pendientes, vista 3D por especialidad, estado de materias, registro de folios y modo presentación (rotación automática cada 12 s). Incluye el filtro **por especialidad**, que se aplica a indicadores, tablas y registro. |
-| **Vista 3D** | Escena en perspectiva, con movimiento de cámara y profundidad. Cada especialidad es una franja y cada materia un bloque: la altura es el número de folios y el color, el estado. Un rombo flotante indica si debe responder la IF o la SC. Se gira arrastrando, se acerca con la rueda y un clic en un bloque filtra su especialidad. Las tarjetas de indicadores se inclinan en 3D según la posición del cursor. |
+| **Visualizar** | Menú de vistas: panel completo, acciones pendientes, estado de materias, registro de folios y modo presentación (rotación automática cada 12 s). Incluye el filtro **por especialidad**, que se aplica a indicadores, tablas y registro. |
+| **Profundidad** | Los indicadores y los botones se inclinan en 3D según la posición del cursor y se hunden al pulsarlos. Las opciones del menú Visualizar sobresalen levemente al recorrerlas. Se desactiva si el sistema pide reducir el movimiento. |
 | **Modo documentación** | Abre en claude.ai el panel documental de la carpeta `DOCUMENTACION`, con árbol, búsqueda y filtros. |
 | **Actualizar** | Vuelve a leer `data/*.json`, recalcula los indicadores y anuncia con aviso visual y sonoro los folios nuevos. |
 | **Barra de actualización** | Ciclo diario de lunes a viernes, con cuenta regresiva hasta las 08:00 (hora de Chile); en pausa sábado y domingo. Cada apertura o recarga trae los datos vigentes. |
@@ -22,7 +22,7 @@ El visor consolida los folios intercambiados entre la Sociedad Concesionaria Des
 ```
 index.html                  Visor (HTML + CSS + JS, sin dependencias de red)
 assets/style.css, app.js    Estilos y lógica
-assets/vista3d.js           Vista 3D (canvas con proyección en perspectiva) y efecto de profundidad
+assets/profundidad.js       Efecto de profundidad 3D en indicadores y botones
 explorador/index.html       Explorador documental (código fuente, sin identificadores de Drive)
 explorador/fondos/          Fotografías de fondo en rotación (visor y explorador)
 vendor/d3.min.js            d3 v7
@@ -30,7 +30,7 @@ data/folios.json            Un registro por folio
 data/materias.json          Materias contractuales, estado y parte que debe responder
 data/meta.json              Fecha de la última sincronización
 data/plazos.json            Plazos de respuesta de las BALI y regla aplicable a cada materia
-data/especialidades.json    Especialidades según los cargos del TDR de la AIF (filtro y vista 3D)
+data/especialidades.json    Especialidades según los cargos del TDR de la AIF (filtro del menú Visualizar)
 data/ds15.json              Disposiciones del D.S. MOP N° 15/2026 (adjudicación) por materia, con hitos
 scripts/sync_drive.py       Sincronización Drive → data/
 scripts/config.json         ID de la carpeta de Drive y firmantes de cada parte

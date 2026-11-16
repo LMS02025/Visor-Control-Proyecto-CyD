@@ -271,13 +271,6 @@ td.ds { min-width: 12rem; max-width: 17rem; cursor: help; line-height: 1.4; }
 .filtro-esp b { color: var(--gold); }
 .filtro-esp .btn { padding: 6px 14px; font-size: 13px; }
 
-/* Vista 3D */
-#vista3d { --c: var(--sapphire); }
-.v3d { position: relative; width: 100%; border-radius: 12px; overflow: hidden; touch-action: none;
-  background: radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--gold) 10%, transparent), transparent 70%), color-mix(in srgb, var(--panel2) 55%, transparent); }
-.v3d canvas { display: block; width: 100%; cursor: grab; }
-.v3d canvas:active { cursor: grabbing; }
-
 /* Profundidad en indicadores */
 .tiles { perspective: 900px; }
 .tile { transform-style: preserve-3d; will-change: transform; transition: transform .18s ease-out, box-shadow .25s; }
@@ -285,3 +278,30 @@ td.ds { min-width: 12rem; max-width: 17rem; cursor: help; line-height: 1.4; }
 .tile::before { background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,.28), transparent 55%); transform: none; transition: none; }
 .tile:hover::before { transform: none; }
 .tile:hover .val { transform: translateZ(30px) scale(1.04); }
+
+/* Profundidad en botones: relieve al pasar el cursor y hundimiento al pulsar */
+.toolbar, .filtro-esp { perspective: 600px; }
+.toolbar .btn, .filtro-esp .btn { transform-style: preserve-3d; will-change: transform;
+  transition: transform .16s ease-out, box-shadow .2s ease, filter .2s ease;
+  box-shadow: 0 1px 0 rgba(255,255,255,.18) inset, 0 -2px 0 rgba(0,0,0,.18) inset, 0 6px 14px -8px var(--b, rgba(0,0,0,.4)); }
+.toolbar .btn:hover, .filtro-esp .btn:hover {
+  box-shadow: 0 1px 0 rgba(255,255,255,.22) inset, 0 -3px 0 rgba(0,0,0,.2) inset, 0 14px 22px -10px var(--b, rgba(0,0,0,.45)), 0 4px 0 -1px color-mix(in srgb, var(--b, #000) 55%, #000); }
+.toolbar .btn::after, .filtro-esp .btn::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,.35), transparent 60%); transition: opacity .2s; }
+.toolbar .btn, .filtro-esp .btn { position: relative; }
+.toolbar .btn:hover::after, .filtro-esp .btn:hover::after { opacity: 1; }
+
+/* Menú Visualizar: cada opción sobresale levemente al recorrerla */
+.menu-list { perspective: 500px; transform-style: preserve-3d; }
+.menu-list button, #menu-esp button { position: relative; transition: transform .16s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease, background .18s ease, color .18s; transform-origin: left center; }
+.menu-list button:hover, #menu-esp button:hover, .menu-list button:focus-visible, #menu-esp button:focus-visible {
+  transform: translateX(6px) translateZ(18px) scale(1.035); background: var(--panel-solid); color: var(--gold);
+  box-shadow: 0 10px 18px -10px rgba(0,0,0,.45), 0 0 0 1px color-mix(in srgb, var(--gold) 35%, transparent), -3px 0 0 var(--gold); z-index: 1; }
+.menu-list button:active, #menu-esp button:active { transform: translateX(4px) translateZ(4px) scale(.99); }
+@media (prefers-reduced-motion: reduce) {
+  .menu-list button:hover, #menu-esp button:hover { transform: none; }
+  .toolbar .btn, .filtro-esp .btn { transition: none; }
+}
+.top { position: relative; z-index: 40; }
+#menu-esp { padding: 3px 12px 3px 2px; }
+.menu-list button:hover, #menu-esp button:hover, .menu-list button:focus-visible, #menu-esp button:focus-visible { transform: translateX(4px) translateZ(16px) scale(1.03); }

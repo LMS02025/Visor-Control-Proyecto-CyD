@@ -27,7 +27,6 @@
         <div class="menu-list" id="menu-ver" role="menu" hidden>
           <button role="menuitemradio" data-view="todo" aria-checked="true">Todo el panel</button>
           <button role="menuitemradio" data-view="pendientes" aria-checked="false">Acciones pendientes</button>
-          <button role="menuitemradio" data-view="vista3d" aria-checked="false">Vista 3D por especialidad</button>
           <button role="menuitemradio" data-view="materias" aria-checked="false">Estado de materias</button>
           <button role="menuitemradio" data-view="registro" aria-checked="false">Registro de folios</button>
           <button role="menuitemradio" data-view="presentacion" aria-checked="false">Modo presentación (rotativo)</button>
@@ -82,12 +81,6 @@
       </table></div>
     </section>
 
-    <section class="card" id="vista3d" data-views="todo vista3d">
-      <h2>Vista 3D de materias por especialidad</h2>
-      <p class="hint">Cada bloque es una materia: su altura es el número de folios y su color, el estado (verde: aprobado o cerrado; ámbar: en revisión o sin pronunciamiento; rojo: observado; gris pizarra: informativo). El rombo flotante indica la parte que debe responder (IF o SC). Arrastre para girar, use la rueda para acercar y haga clic en un bloque para filtrar su especialidad.</p>
-      <div class="v3d" id="v3d"></div>
-    </section>
-
     <section class="card" id="materias" data-views="todo materias">
       <h2>Estado de todas las materias</h2>
       <p class="hint">Agrupación de los folios por materia contractual y estado según el último pronunciamiento registrado. La columna DS 15 indica lo que el Decreto Supremo MOP N° 15/2026 de adjudicación agrega a cada materia; pase el cursor para ver su texto.</p>
@@ -121,7 +114,7 @@
 <div class="toast" id="toast" role="status" hidden></div>
 <div class="tip" id="tip" hidden></div>
 <script src="vendor/d3.min.js"></script>
-<script src="assets/vista3d.js"></script>
+<script src="assets/profundidad.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/fondos.js"></script>
 </body>

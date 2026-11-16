@@ -225,7 +225,6 @@
     const { mat, kpi } = calcular();
     drawKpis(kpi); drawPendientes(mat); drawMaterias(mat); drawRegistro();
     const fb = $('#filtro-esp'); fb.hidden = !state.esp; $('#filtro-esp-nom').textContent = espNombre(state.esp);
-    if (window.Vista3D && !$('#vista3d').hidden) window.Vista3D.actualizar(calcular(true).mat, state.esps, state.esp, setEsp);
     rotuloVer();
   }
 
@@ -302,7 +301,7 @@
   const menu = $('#menu-ver'), btnVer = $('#btn-ver');
   btnVer.addEventListener('click', () => { unlock(); play('click'); menu.hidden = !menu.hidden; btnVer.setAttribute('aria-expanded', String(!menu.hidden)); });
   document.addEventListener('click', (e) => { if (!e.target.closest('.menu')) { menu.hidden = true; btnVer.setAttribute('aria-expanded', 'false'); } });
-  const VISTAS = ['todo', 'pendientes', 'vista3d', 'materias', 'registro'];
+  const VISTAS = ['todo', 'pendientes', 'materias', 'registro'];
   let rot = null;
   function setVista(v, silencio) {
     state.view = v; const mostrar = v === 'presentacion' ? VISTAS[1] : v;
