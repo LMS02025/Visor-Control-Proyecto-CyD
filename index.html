@@ -27,9 +27,12 @@
         <div class="menu-list" id="menu-ver" role="menu" hidden>
           <button role="menuitemradio" data-view="todo" aria-checked="true">Todo el panel</button>
           <button role="menuitemradio" data-view="pendientes" aria-checked="false">Acciones pendientes</button>
+          <button role="menuitemradio" data-view="vista3d" aria-checked="false">Vista 3D por especialidad</button>
           <button role="menuitemradio" data-view="materias" aria-checked="false">Estado de materias</button>
           <button role="menuitemradio" data-view="registro" aria-checked="false">Registro de folios</button>
           <button role="menuitemradio" data-view="presentacion" aria-checked="false">Modo presentación (rotativo)</button>
+          <div class="menu-sep" role="separator">Filtrar por especialidad</div>
+          <div id="menu-esp" role="group" aria-label="Especialidad"></div>
         </div>
       </div>
       <a class="btn" href="https://claude.ai/artifact/MFFk47NGSvPQMffjYbyyE7" target="_blank" rel="noopener" title="Abre el panel documental en claude.ai">
@@ -53,6 +56,8 @@
   </div>
 
   <main id="vistas">
+    <div class="filtro-esp" id="filtro-esp" hidden><span>Filtro activo · Especialidad: <b id="filtro-esp-nom"></b></span><button type="button" class="btn" id="filtro-esp-quitar">Quitar filtro</button></div>
+
     <section class="takeaway card-in" data-views="todo pendientes">
       <p>Al <b data-k="corte">—</b> (fecha de corte), el libro registra <b data-k="total">—</b> folios; el último fue emitido el <b data-k="ultima">—</b>. <b class="warn" data-k="pend_if">—</b> materias esperan pronunciamiento de la Inspección Fiscal y <b class="bad" data-k="pend_sc">—</b> esperan respuesta de la Sociedad Concesionaria. Conforme a las BALI, <b class="bad" data-k="venc">—</b> plazos de respuesta están vencidos y <b class="warn" data-k="prox">—</b> vencen dentro de los próximos 7 días.</p>
     </section>
@@ -75,6 +80,12 @@
         <thead><tr><th>Materia</th><th>Artículo BALI</th><th>DS 15</th><th>Debe responder</th><th>Estado</th><th class="num">Último folio</th><th class="num">Días transcurridos</th><th>Plazo BALI</th><th class="num">Vencimiento</th><th>Situación</th></tr></thead>
         <tbody id="t-pend"></tbody>
       </table></div>
+    </section>
+
+    <section class="card" id="vista3d" data-views="todo vista3d">
+      <h2>Vista 3D de materias por especialidad</h2>
+      <p class="hint">Cada bloque es una materia: su altura es el número de folios y su color, el estado (verde: aprobado o cerrado; ámbar: en revisión o sin pronunciamiento; rojo: observado; gris pizarra: informativo). El rombo flotante indica la parte que debe responder (IF o SC). Arrastre para girar, use la rueda para acercar y haga clic en un bloque para filtrar su especialidad.</p>
+      <div class="v3d" id="v3d"></div>
     </section>
 
     <section class="card" id="materias" data-views="todo materias">
@@ -110,6 +121,7 @@
 <div class="toast" id="toast" role="status" hidden></div>
 <div class="tip" id="tip" hidden></div>
 <script src="vendor/d3.min.js"></script>
+<script src="assets/vista3d.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/fondos.js"></script>
 </body>

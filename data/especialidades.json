@@ -1,0 +1,13 @@
+{
+ "nota": "Agrupación de las materias contractuales por especialidad, usada por el filtro «Especialidad» del menú Visualizar y por la vista 3D. Una materia que no figure aquí se muestra en «Otras».",
+ "especialidades": [
+  {"id": "contractual", "nombre": "Contractual y societaria", "materias": ["M01", "M02", "M16", "M25"]},
+  {"id": "finanzas", "nombre": "Garantías, pagos y avance", "materias": ["M03", "M04", "M22", "M23", "M24"]},
+  {"id": "equipo", "nombre": "Equipo profesional", "materias": ["M06", "M07", "M15"]},
+  {"id": "ingenieria", "nombre": "Ingeniería y diseño", "materias": ["M08", "M09", "M12", "M17", "M21"]},
+  {"id": "bim", "nombre": "BIM", "materias": ["M10", "M11"]},
+  {"id": "ambiental", "nombre": "Ambiental y sustentabilidad", "materias": ["M13", "M14"]},
+  {"id": "terreno", "nombre": "Topografía y geotecnia", "materias": ["M18", "M19", "M20"]},
+  {"id": "terrenos", "nombre": "Terrenos y expropiaciones", "materias": ["M05"]}
+ ]
+}

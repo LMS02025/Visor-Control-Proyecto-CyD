@@ -28,7 +28,7 @@
     return `url(#${id})`;
   };
   const motion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const state = { folios: [], materias: [], meta: {}, plazos: {}, ds15: {}, prevIds: null, nuevos: new Set(), sortKey: 'folio', sortDir: -1, view: 'todo', next: 0, loading: false };
+  const state = { folios: [], materias: [], meta: {}, plazos: {}, ds15: {}, esps: [], esp: '', prevIds: null, nuevos: new Set(), sortKey: 'folio', sortDir: -1, view: 'todo', next: 0, loading: false };
 
   /* ---------- Sonido (Web Audio, sin archivos externos) ---------- */
   const audio = { ctx: null, on: true };
@@ -97,8 +97,14 @@
   const toast = (msg) => { const t = $('#toast'); t.hidden = true; void t.offsetWidth; t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => { t.hidden = true; }, 3700); };
 
   /* ---------- Cálculos ---------- */
-  function calcular() {
-    const { folios, materias } = state;
+  /* Filtro por especialidad */
+  const espDe = (mid) => { const e = state.esps.find((x) => x.materias.includes(mid)); return e ? e.id : 'otras'; };
+  const espNombre = (id) => (id === 'otras' ? 'Otras' : (state.esps.find((x) => x.id === id) || {}).nombre || '');
+  const enEsp = (mid) => !state.esp || espDe(mid) === state.esp;
+
+  function calcular(todas) {
+    const folios = todas ? state.folios : state.folios.filter((f) => enEsp(f.materia_id));
+    const materias = todas ? state.materias : state.materias.filter((m) => enEsp(m.materia_id));
     const byId = new Map(folios.map((f) => [+f.folio, f]));
     const respuestas = [];
     for (const f of folios) {
@@ -203,7 +209,7 @@
     const tb = $('#t-reg'); tb.replaceChildren();
     const q = $('#q').value.toLowerCase().trim(), em = $('#f-em').value, pr = $('#f-pr').value;
     const num = (k) => k === 'folio' || k === 'adjuntos', { sortKey: k, sortDir: s } = state;
-    state.folios.filter((f) => (!em || f.emisor === em) && (!pr || f.prioridad === pr) && (!q || [f.folio, f.asunto, f.materia, f.por, f.para, f.tipo, f.refs].join(' ').toLowerCase().includes(q)))
+    state.folios.filter((f) => enEsp(f.materia_id) && (!em || f.emisor === em) && (!pr || f.prioridad === pr) && (!q || [f.folio, f.asunto, f.materia, f.por, f.para, f.tipo, f.refs].join(' ').toLowerCase().includes(q)))
       .sort((a, b) => s * (num(k) ? +a[k] - +b[k] : String(a[k]).localeCompare(String(b[k]), 'es')))
       .forEach((f) => {
         const tr = tb.insertRow(); if (state.nuevos.has(+f.folio)) tr.className = 'row-new';
@@ -216,8 +222,32 @@
   }
 
   function render() {
-    const { respuestas, mat, kpi } = calcular();
+    const { mat, kpi } = calcular();
     drawKpis(kpi); drawPendientes(mat); drawMaterias(mat); drawRegistro();
+    const fb = $('#filtro-esp'); fb.hidden = !state.esp; $('#filtro-esp-nom').textContent = espNombre(state.esp);
+    if (window.Vista3D && !$('#vista3d').hidden) window.Vista3D.actualizar(calcular(true).mat, state.esps, state.esp, setEsp);
+    rotuloVer();
+  }
+
+  function rotuloVer() {
+    const b = $(`#menu-ver [data-view="${state.view}"]`);
+    $('#ver-actual').textContent = (b ? b.textContent.replace(/ \(.*\)/, '') : '') + (state.esp ? ' · ' + espNombre(state.esp) : '');
+    $$('#menu-esp [data-esp]').forEach((x) => x.setAttribute('aria-checked', String(x.dataset.esp === state.esp)));
+  }
+  function setEsp(id) {
+    state.esp = id || ''; play('vista'); render();
+    try { sessionStorage.setItem('visor-esp', state.esp); } catch (e) { /* sin almacenamiento */ }
+  }
+  function armarMenuEsp() {
+    const cont = $('#menu-esp'); cont.replaceChildren();
+    const opc = [{ id: '', nombre: 'Todas las especialidades' }, ...state.esps];
+    if (state.materias.some((m) => espDe(m.materia_id) === 'otras')) opc.push({ id: 'otras', nombre: 'Otras' });
+    opc.forEach((e) => {
+      const n = e.id ? state.materias.filter((m) => espDe(m.materia_id) === e.id).length : state.materias.length;
+      const b = document.createElement('button'); b.setAttribute('role', 'menuitemradio'); b.dataset.esp = e.id; b.textContent = `${e.nombre} (${n})`;
+      b.addEventListener('click', () => { $('#menu-ver').hidden = true; setEsp(e.id); });
+      cont.appendChild(b);
+    });
   }
 
   /* ---------- Carga y actualización ---------- */
@@ -227,10 +257,12 @@
     const btn = $('#btn-act'); btn.classList.add('spin'); $('#estado-sync').textContent = 'Actualizando contenido…';
     if (origen !== 'inicio') play('inicio');
     try {
-      const [folios, materias, meta, plazos, ds15] = await Promise.all([getJSON('data/folios.json'), getJSON('data/materias.json'), getJSON('data/meta.json').catch(() => ({})), getJSON('data/plazos.json').catch(() => ({})), getJSON('data/ds15.json').catch(() => ({}))]);
+      const [folios, materias, meta, plazos, ds15, esps] = await Promise.all([getJSON('data/folios.json'), getJSON('data/materias.json'), getJSON('data/meta.json').catch(() => ({})), getJSON('data/plazos.json').catch(() => ({})), getJSON('data/ds15.json').catch(() => ({})), getJSON('data/especialidades.json').catch(() => ({}))]);
       const ids = new Set(folios.map((f) => +f.folio));
       state.nuevos = state.prevIds ? new Set([...ids].filter((i) => !state.prevIds.has(i))) : new Set();
-      state.prevIds = ids; state.folios = folios; state.materias = materias; state.meta = meta; state.plazos = plazos; state.ds15 = ds15;
+      state.prevIds = ids; state.folios = folios; state.materias = materias; state.meta = meta; state.plazos = plazos; state.ds15 = ds15; state.esps = esps.especialidades || [];
+      if (state.esp === '' && !state.espIni) { state.espIni = true; try { const g = sessionStorage.getItem('visor-esp'); if (g && (g === 'otras' || state.esps.some((x) => x.id === g))) state.esp = g; } catch (e) { /* sin almacenamiento */ } }
+      armarMenuEsp();
       render();
       $$('.card, .tile, .takeaway').forEach((c) => { c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); });
       const ahora = new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -270,13 +302,12 @@
   const menu = $('#menu-ver'), btnVer = $('#btn-ver');
   btnVer.addEventListener('click', () => { unlock(); play('click'); menu.hidden = !menu.hidden; btnVer.setAttribute('aria-expanded', String(!menu.hidden)); });
   document.addEventListener('click', (e) => { if (!e.target.closest('.menu')) { menu.hidden = true; btnVer.setAttribute('aria-expanded', 'false'); } });
-  const VISTAS = ['todo', 'pendientes', 'materias', 'registro'];
+  const VISTAS = ['todo', 'pendientes', 'vista3d', 'materias', 'registro'];
   let rot = null;
   function setVista(v, silencio) {
     state.view = v; const mostrar = v === 'presentacion' ? VISTAS[1] : v;
     $$('[data-views]').forEach((s) => { s.hidden = !s.dataset.views.split(' ').includes(mostrar); });
     $$('#menu-ver [data-view]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.view === v)));
-    $('#ver-actual').textContent = $(`#menu-ver [data-view="${v}"]`).textContent.replace(/ \(.*\)/, '');
     clearInterval(rot);
     if (v === 'presentacion') {
       let i = 1;
@@ -285,6 +316,7 @@
     render(); if (!silencio) play('vista'); scrollTo({ top: 0, behavior: motion ? 'smooth' : 'auto' });
   }
   $$('#menu-ver [data-view]').forEach((b) => b.addEventListener('click', () => { menu.hidden = true; setVista(b.dataset.view); }));
+  $('#filtro-esp-quitar').addEventListener('click', () => setEsp(''));
   ['#q', '#f-em', '#f-pr'].forEach((s) => $(s).addEventListener('input', drawRegistro));
   $$('#t-reg-tab th[data-sort] button').forEach((b) => b.addEventListener('click', () => {
     const k = b.closest('th').dataset.sort; play('click');

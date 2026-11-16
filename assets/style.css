@@ -258,3 +258,30 @@ td.ds { min-width: 12rem; max-width: 17rem; cursor: help; line-height: 1.4; }
 #pendientes th, #pendientes td { padding-left: 8px; padding-right: 8px; }
 #pendientes th { white-space: normal; vertical-align: bottom; }
 #pendientes td.wrap { min-width: 11rem; } #pendientes td.ds { min-width: 11rem; }
+
+/* Filtro por especialidad */
+.menu-sep { margin: 8px 6px 4px; padding-top: 8px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; }
+#menu-esp { display: flex; flex-direction: column; max-height: 300px; overflow: auto; }
+#menu-esp button { all: unset; padding: 7px 12px; border-radius: 9px; cursor: pointer; font-size: 13px; }
+#menu-esp button:hover { background: var(--panel2); color: var(--gold); }
+#menu-esp button[aria-checked=true] { color: var(--gold); font-weight: 600; }
+#menu-esp button[aria-checked=true]::before { content: "◆ "; font-size: 10px; }
+.filtro-esp { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border-radius: var(--radius);
+  background: color-mix(in srgb, var(--gold) 14%, var(--panel-solid)); border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent); font-size: 14px; }
+.filtro-esp b { color: var(--gold); }
+.filtro-esp .btn { padding: 6px 14px; font-size: 13px; }
+
+/* Vista 3D */
+#vista3d { --c: var(--sapphire); }
+.v3d { position: relative; width: 100%; border-radius: 12px; overflow: hidden; touch-action: none;
+  background: radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--gold) 10%, transparent), transparent 70%), color-mix(in srgb, var(--panel2) 55%, transparent); }
+.v3d canvas { display: block; width: 100%; cursor: grab; }
+.v3d canvas:active { cursor: grabbing; }
+
+/* Profundidad en indicadores */
+.tiles { perspective: 900px; }
+.tile { transform-style: preserve-3d; will-change: transform; transition: transform .18s ease-out, box-shadow .25s; }
+.tile .val, .tile .lbl { transform: translateZ(24px); }
+.tile::before { background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,.28), transparent 55%); transform: none; transition: none; }
+.tile:hover::before { transform: none; }
+.tile:hover .val { transform: translateZ(30px) scale(1.04); }
