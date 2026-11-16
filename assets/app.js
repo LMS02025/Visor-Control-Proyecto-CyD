@@ -244,7 +244,7 @@
     if (state.materias.some((m) => espDe(m.materia_id) === 'otras')) opc.push({ id: 'otras', nombre: 'Otras' });
     opc.forEach((e) => {
       const n = e.id ? state.materias.filter((m) => espDe(m.materia_id) === e.id).length : state.materias.length;
-      const b = document.createElement('button'); b.setAttribute('role', 'menuitemradio'); b.dataset.esp = e.id; b.textContent = `${e.nombre} (${n})`;
+      const b = document.createElement('button'); b.setAttribute('role', 'menuitemradio'); b.dataset.esp = e.id; b.textContent = `${e.nombre} (${n})`; if (e.funcion) b.title = `TDR AIF, cargo ${e.tdr}: ${e.funcion}`;
       b.addEventListener('click', () => { $('#menu-ver').hidden = true; setEsp(e.id); });
       cont.appendChild(b);
     });

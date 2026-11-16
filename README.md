@@ -30,7 +30,7 @@ data/folios.json            Un registro por folio
 data/materias.json          Materias contractuales, estado y parte que debe responder
 data/meta.json              Fecha de la última sincronización
 data/plazos.json            Plazos de respuesta de las BALI y regla aplicable a cada materia
-data/especialidades.json    Agrupación de materias por especialidad (filtro y vista 3D)
+data/especialidades.json    Especialidades según los cargos del TDR de la AIF (filtro y vista 3D)
 data/ds15.json              Disposiciones del D.S. MOP N° 15/2026 (adjudicación) por materia, con hitos
 scripts/sync_drive.py       Sincronización Drive → data/
 scripts/config.json         ID de la carpeta de Drive y firmantes de cada parte

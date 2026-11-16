@@ -52,16 +52,21 @@
     const rows = [];
     especialidades.forEach((e) => { const ms = e.materias.map((id) => porMat.get(id)).filter(Boolean); ms.forEach((m) => usadas.add(m.materia_id)); if (ms.length) rows.push({ id: e.id, nombre: e.nombre, ms }); });
     const otras = materias.filter((m) => !usadas.has(m.materia_id)); if (otras.length) rows.push({ id: 'otras', nombre: 'Otras', ms: otras });
-    const maxCols = Math.max(...rows.map((r) => r.ms.length), 1), maxF = Math.max(...materias.map((m) => m.n_folios), 1);
+    // Filas con muchas materias se disponen en 2 o 3 carriles para acotar la profundidad.
+    rows.forEach((r) => { r.lanes = r.ms.length > 8 ? 3 : r.ms.length > 3 ? 2 : 1; r.hw = 0.45 + r.lanes * 0.42; });
+    const maxCols = Math.max(...rows.map((r) => Math.ceil(r.ms.length / r.lanes)), 1), maxF = Math.max(...materias.map((m) => m.n_folios), 1);
     // Especialidades a lo largo del eje X (ancho del lienzo) y materias en profundidad (eje Z).
-    const DX = 2.5, DZ = 1.35, H = 4.6;
+    const DZ = 1.35, H = 4.6;
     const zf = ((maxCols - 1) / 2) * DZ + 0.75;
-    S.rows = rows.map((r, i) => ({ ...r, x: (i - (rows.length - 1) / 2) * DX, z0: -zf, z1: zf }));
+    // Posición X acumulada según el ancho de cada franja (separación constante entre franjas).
+    const GAP = 1.0; let acc = 0; const xs = rows.map((r) => { const x = acc + r.hw; acc += 2 * r.hw + GAP; return x; });
+    const off = (acc - GAP) / 2;
+    S.rows = rows.map((r, i) => ({ ...r, x: xs[i] - off, z0: -zf, z1: zf }));
     S.bars = [];
-    S.rows.forEach((r) => r.ms.forEach((m, j) => S.bars.push({ m, row: r, x: r.x, z: (j - (maxCols - 1) / 2) * DZ, h: 0.35 + (H * m.n_folios) / maxF, fase: Math.random() * 6.28 })));
+    S.rows.forEach((r) => r.ms.forEach((m, j) => S.bars.push({ m, row: r, x: r.x + ((j % r.lanes) - (r.lanes - 1) / 2) * 0.88, z: (Math.floor(j / r.lanes) - (maxCols - 1) / 2) * DZ, h: 0.35 + (H * m.n_folios) / maxF, fase: Math.random() * 6.28 })));
     // Puntos de encuadre: esquinas de cada franja, cima de cada barra (con su marcador) y rótulos.
     S.box = [];
-    S.rows.forEach((r) => { for (const x of [r.x - 0.8, r.x + 0.8]) for (const z of [r.z0 - 0.9, r.z1]) S.box.push([x, 0, z]); });
+    S.rows.forEach((r) => { for (const x of [r.x - r.hw, r.x + r.hw]) for (const z of [r.z0 - 0.9, r.z1]) S.box.push([x, 0, z]); });
     S.bars.forEach((b) => { for (const dx of [-0.45, 0.45]) S.box.push([b.x + dx, b.h + 1.0, b.z]); });
     S.k = 0; encuadrar(false);
   }
@@ -102,7 +107,7 @@
     const filas = S.rows.map((r) => ({ r, d: proyectar(0, 0, r.z)[2] })).sort((a, b) => b.d - a.d);
     filas.forEach(({ r }) => {
       const act = !S.esp || S.esp === r.id;
-      const P = [[r.x - 0.8, 0, r.z0], [r.x + 0.8, 0, r.z0], [r.x + 0.8, 0, r.z1], [r.x - 0.8, 0, r.z1]].map((v) => proyectar(...v));
+      const P = [[r.x - r.hw, 0, r.z0], [r.x + r.hw, 0, r.z0], [r.x + r.hw, 0, r.z1], [r.x - r.hw, 0, r.z1]].map((v) => proyectar(...v));
       ctx.beginPath(); P.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.closePath();
       ctx.fillStyle = rgba(line, 1, act ? 0.14 : 0.04); ctx.fill(); ctx.strokeStyle = rgba(line, 1, act ? 0.5 : 0.12); ctx.lineWidth = 1; ctx.stroke();
     });

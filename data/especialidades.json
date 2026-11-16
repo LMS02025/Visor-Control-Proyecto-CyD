@@ -1,13 +1,17 @@
 {
- "nota": "Agrupación de las materias contractuales por especialidad, usada por el filtro «Especialidad» del menú Visualizar y por la vista 3D. Una materia que no figure aquí se muestra en «Otras».",
+ "fuente": "Términos de Referencia «Asesoría a la Inspección Fiscal, Etapa de Construcción – Fase de Ingeniería, de la obra Concesión Planta Desaladora para la Región de Coquimbo» (DGC–MOP), punto de personal de la Asesoría (cargos 1 a 12).",
+ "nota": "Cada materia se asigna al cargo de la Asesoría que, según sus funciones en el TDR, actúa como contraparte técnica. Los cargos sin materias en el Libro de Obras se listan con 0. Una materia que no figure aquí se muestra en «Otras».",
  "especialidades": [
-  {"id": "contractual", "nombre": "Contractual y societaria", "materias": ["M01", "M02", "M16", "M25"]},
-  {"id": "finanzas", "nombre": "Garantías, pagos y avance", "materias": ["M03", "M04", "M22", "M23", "M24"]},
-  {"id": "equipo", "nombre": "Equipo profesional", "materias": ["M06", "M07", "M15"]},
-  {"id": "ingenieria", "nombre": "Ingeniería y diseño", "materias": ["M08", "M09", "M12", "M17", "M21"]},
-  {"id": "bim", "nombre": "BIM", "materias": ["M10", "M11"]},
-  {"id": "ambiental", "nombre": "Ambiental y sustentabilidad", "materias": ["M13", "M14"]},
-  {"id": "terreno", "nombre": "Topografía y geotecnia", "materias": ["M18", "M19", "M20"]},
-  {"id": "terrenos", "nombre": "Terrenos y expropiaciones", "materias": ["M05"]}
+  {"id": "jefe-asesoria", "tdr": 1, "nombre": "Jefe de Asesoría", "funcion": "Fiscalización de las materias administrativas, financieras y jurídicas del contrato; visación de pagos, garantías y mecanismos de riesgo.", "materias": ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M16", "M22", "M23", "M24", "M25"]},
+  {"id": "jefe-proyectos", "tdr": 2, "nombre": "Jefe de Proyectos", "funcion": "Fiscalización del PEPID y de los Proyectos de Ingeniería de Detalle, control de entregas e integración de especialidades.", "materias": ["M08", "M09", "M18"]},
+  {"id": "procesos", "tdr": 3, "nombre": "Ingeniero de Procesos", "funcion": "Revisión de procesos y equipos mecánicos de desalación; contraparte del Responsable de Procesos de la SC.", "materias": []},
+  {"id": "maritimas", "tdr": 4, "nombre": "Encargado de Obras Marítimas", "funcion": "Captación, descarga, emisario, impulsión de agua de mar y estructuras costeras; integra geotecnia marina.", "materias": ["M17", "M20"]},
+  {"id": "electricidad", "tdr": 6, "nombre": "Encargado de Electricidad", "funcion": "Proyectos eléctricos y de corrientes débiles; contraparte del Responsable de Electricidad de la SC.", "materias": []},
+  {"id": "control", "tdr": 7, "nombre": "Encargado de Instrumentación, Control y Automatización", "funcion": "Instrumentación de campo, PLC, SCADA y comunicaciones.", "materias": []},
+  {"id": "civiles", "tdr": 8, "nombre": "Encargado de Obras Civiles", "funcion": "Proyectos estructurales y revisión de la mecánica de suelos y su coherencia con las estructuras.", "materias": ["M12", "M19"]},
+  {"id": "hidraulico", "tdr": 9, "nombre": "Encargado Hidráulico", "funcion": "Conducciones, impulsiones, transientes, obras sanitarias y piping.", "materias": ["M21"]},
+  {"id": "ambiental", "tdr": 10, "nombre": "Encargado en Materias Ambientales", "funcion": "Medio ambiente, territorio y paisajismo; cumplimiento de la RCA y de los planes ambientales.", "materias": ["M13", "M14", "M15"]},
+  {"id": "social", "tdr": 11, "nombre": "Encargado de Materias Sociales y Territoriales", "funcion": "Programas de Participación Ciudadana e Información y Difusión; coordinación territorial.", "materias": []},
+  {"id": "bim", "tdr": 12, "nombre": "Revisor de proyectos BIM", "funcion": "Cumplimiento de la metodología BIM, revisión del PEB y coordinación de modelos.", "materias": ["M10", "M11"]}
  ]
 }
