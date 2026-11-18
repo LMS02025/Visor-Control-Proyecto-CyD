@@ -75,10 +75,10 @@
   "materia_id": "M09",
   "materia": "Ingeniería de detalle Fase 1 Rev. A: criterios y bases de diseño",
   "articulo": "Art. 1.10.1.2",
-  "folios": "67;68",
+  "folios": "67;68;97",
   "estado": "En revisión",
   "responde": "IF",
-  "situacion": "Entregados USCI 4 (F67) y USCIs 1-2-3-6-7 (F68); sin pronunciamiento registrado."
+  "situacion": "Entregados USCI 4 (F67), USCIs 1-2-3-6-7 (F68) y USCI 8, Ingeniería Línea Eléctrica, con declaración jurada (F97); sin pronunciamiento registrado."
  },
  {
   "materia_id": "M10",
@@ -156,10 +156,10 @@
   "materia_id": "M18",
   "materia": "Plan de Trabajo de Topografía",
   "articulo": "Art. 2.2.2.2.1",
-  "folios": "44;62;77;87;93",
-  "estado": "En revisión",
-  "responde": "IF",
-  "situacion": "Rev. B aprobada (F87). La SC toma conocimiento y entrega la aclaración solicitada (DCOQ-SAC-Z1-TPF-PN-0001_RB AD) como complemento del plan (F93)."
+  "folios": "44;62;77;87;93;96",
+  "estado": "Aprobado",
+  "responde": "—",
+  "situacion": "IF aprueba la aclaración DCOQ-SAC-Z1-TPF-PN-0001_RB AD, que subsana la observación de la aprobación de la Rev. B; no se requiere modificar el documento matriz (F96)."
  },
  {
   "materia_id": "M19",
@@ -201,10 +201,10 @@
   "materia_id": "M23",
   "materia": "Información periódica y estados financieros",
   "articulo": "Art. 1.15.5.3",
-  "folios": "29;39;51;57;71",
+  "folios": "29;39;51;57;71;98",
   "estado": "Informativo",
   "responde": "—",
-  "situacion": "Reportes mensuales hasta septiembre de 2026 y EE.FF. al 30/06/2026."
+  "situacion": "Reportes mensuales hasta octubre de 2026, sin accidentes ni denuncias laborales en el período (F98); EE.FF. al 30/06/2026."
  },
  {
   "materia_id": "M24",
@@ -223,5 +223,14 @@
   "estado": "Informativo",
   "responde": "—",
   "situacion": "Acta de entrega de oficina provisoria (F20); primera publicación de ofertas en BNE (F12)."
+ },
+ {
+  "materia_id": "M26",
+  "materia": "Accesos y ocupaciones en Ruta 5 concesionada (ORD. N° 031/2026)",
+  "articulo": "Art. 1.15.8",
+  "folios": "99",
+  "estado": "En revisión",
+  "responde": "IF",
+  "situacion": "SC solicita dejar sin efecto la instrucción del ORD. N° 031/2026 por superposición con procedimientos propios de las BALI y propone coordinación entre concesiones; pendiente pronunciamiento IF (F99)."
  }
 ]
