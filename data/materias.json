@@ -147,10 +147,10 @@
   "materia_id": "M17",
   "materia": "Modificación de oferta técnica: captación y descarga marítimas",
   "articulo": "Art. 1.9.1.2.1",
-  "folios": "28;64",
-  "estado": "Observado",
-  "responde": "SC",
-  "situacion": "IF exige respuesta fundada y acreditar compatibilidad con el EIA en tramitación (F64)."
+  "folios": "28;64;100",
+  "estado": "En revisión",
+  "responde": "IF",
+  "situacion": "SC responde F64 sosteniendo que la microtunelación es un cambio de metodología constructiva y no una modificación de contrato; informa que desarrolla los antecedentes para su incorporación en la Adenda N° 2 del EIA y ofrece mesas técnicas con SEA y MOP. Pendiente pronunciamiento de la IF (F100)."
  },
  {
   "materia_id": "M18",
@@ -165,10 +165,10 @@
   "materia_id": "M19",
   "materia": "Plan de Exploración Geotécnica Terrestre",
   "articulo": "Art. 2.2.2.2.3",
-  "folios": "45;63;79;90",
-  "estado": "Observado",
-  "responde": "SC",
-  "situacion": "Rev. B subsana la mayor parte; se mantienen observaciones O-01, O-02 y O-04 (ensayos de roca, recuperación de testigos, profundidades y calicatas < 3,0 m). La SC debe presentar nueva versión (F90)."
+  "folios": "45;63;79;90;101",
+  "estado": "En revisión",
+  "responde": "IF",
+  "situacion": "SC presenta Rev. C del Plan y minuta de respuesta a las observaciones O-01, O-02 y O-04 de F90. Pendiente revisión y pronunciamiento de la IF (F101)."
  },
  {
   "materia_id": "M20",

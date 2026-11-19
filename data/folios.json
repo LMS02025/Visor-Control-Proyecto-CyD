@@ -1582,5 +1582,37 @@
   "refs": "",
   "adjuntos": 0,
   "enlace": "https://drive.google.com/file/d/1pwPv4FKgeseaKgexmPpk_KcDzbTr8g1d/view"
+ },
+ {
+  "folio": 100,
+  "fecha": "2026-11-17",
+  "hora": "12:42",
+  "emisor": "SC",
+  "por": "Angel Achau",
+  "para": "Lorena Araya",
+  "tipo": "Entrega Información",
+  "prioridad": "Alta",
+  "materia_id": "M17",
+  "materia": "Modificación de oferta técnica: captación y descarga marítimas",
+  "asunto": "Respuesta a folio LOD N° 64 - Art. 1.9.1.2.1",
+  "refs": "64;28",
+  "adjuntos": 0,
+  "enlace": "https://drive.google.com/file/d/1CjYAf-3CMsRznRO2LDd2HPG0yPr7eOFr/view"
+ },
+ {
+  "folio": 101,
+  "fecha": "2026-11-17",
+  "hora": "12:44",
+  "emisor": "SC",
+  "por": "Angel Achau",
+  "para": "Lorena Araya",
+  "tipo": "Entrega Información",
+  "prioridad": "Alta",
+  "materia_id": "M19",
+  "materia": "Plan de Exploración Geotécnica Terrestre",
+  "asunto": "Envía Plan de Exploración Geotécnica Terrestre (Rev C) - Art. 2.2.2.2.3",
+  "refs": "90;79;45;63",
+  "adjuntos": 2,
+  "enlace": "https://drive.google.com/file/d/1X7IhsxX6LN8rzzmE2C9Eqmh2IZzMg6Rm/view"
  }
 ]
