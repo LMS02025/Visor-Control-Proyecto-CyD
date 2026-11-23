@@ -1614,5 +1614,53 @@
   "refs": "90;79;45;63",
   "adjuntos": 2,
   "enlace": "https://drive.google.com/file/d/1X7IhsxX6LN8rzzmE2C9Eqmh2IZzMg6Rm/view"
+ },
+ {
+  "folio": 102,
+  "fecha": "2026-11-20",
+  "hora": "16:22",
+  "emisor": "IF",
+  "por": "Lorena Araya",
+  "para": "Angel Achau",
+  "tipo": "Entrega Información",
+  "prioridad": "Alta",
+  "materia_id": "M09",
+  "materia": "Ingeniería de detalle Fase 1 Rev. A: criterios y bases de diseño",
+  "asunto": "Remite Observaciones Informe de Criterios y Bases de Diseño (Rev. A)",
+  "refs": "68;67;58",
+  "adjuntos": 7,
+  "enlace": "https://drive.google.com/file/d/1JbGhGfYz9JuXO4U02LpvuHGV1f-TCTfC/view"
+ },
+ {
+  "folio": 103,
+  "fecha": "2026-11-20",
+  "hora": "16:25",
+  "emisor": "IF",
+  "por": "Lorena Araya",
+  "para": "Angel Achau",
+  "tipo": "Entrega Información",
+  "prioridad": "Media",
+  "materia_id": "M14",
+  "materia": "Programa de Gestión Sustentable (PGS)",
+  "asunto": "Actualización del PGS",
+  "refs": "61;48",
+  "adjuntos": 0,
+  "enlace": "https://drive.google.com/file/d/1zLwx2xZAvjL_VnZmemRWYhu-dUgfjiz_/view"
+ },
+ {
+  "folio": 104,
+  "fecha": "2026-11-23",
+  "hora": "10:23",
+  "emisor": "IF",
+  "por": "Lorena Araya",
+  "para": "Angel Achau",
+  "tipo": "Notificación",
+  "prioridad": "Media",
+  "materia_id": "M19",
+  "materia": "Plan de Exploración Geotécnica Terrestre",
+  "asunto": "Aprueba Plan de Exploración Geotécnica Terrestre (Rev C)",
+  "refs": "101;90;45;63;79",
+  "adjuntos": 1,
+  "enlace": "https://drive.google.com/file/d/1Y8x1qGNC7XQ-3otAJA9ijNaTiT1EnCyo/view"
  }
 ]
