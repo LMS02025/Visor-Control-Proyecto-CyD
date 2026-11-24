@@ -174,10 +174,10 @@
   "materia_id": "M20",
   "materia": "Campaña de sondajes marinos",
   "articulo": "Art. 2.2.2.2.4",
-  "folios": "76;91",
-  "estado": "Observado",
-  "responde": "SC",
-  "situacion": "La IF no emite pronunciamiento favorable al inicio de la campaña; exige autorizaciones de la Autoridad Marítima, procedimientos de seguridad y control ambiental, y programa geotécnico fundamentado (F91)."
+  "folios": "76;91;105",
+  "estado": "En revisión",
+  "responde": "IF",
+  "situacion": "SC responde las observaciones de F91 con autorización SHOA, documentación adjunta, láminas informativas y minuta de respuestas; el programa es referencial y el inicio efectivo queda sujeto al V°B° de la Capitanía de Puerto de Coquimbo. Pendiente pronunciamiento IF (F105)."
  },
  {
   "materia_id": "M21",

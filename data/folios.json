@@ -1662,5 +1662,21 @@
   "refs": "101;90;45;63;79",
   "adjuntos": 1,
   "enlace": "https://drive.google.com/file/d/1Y8x1qGNC7XQ-3otAJA9ijNaTiT1EnCyo/view"
+ },
+ {
+  "folio": 105,
+  "fecha": "2026-11-24",
+  "hora": "15:17",
+  "emisor": "SC",
+  "por": "Angel Achau",
+  "para": "Lorena Araya",
+  "tipo": "Entrega Información",
+  "prioridad": "Alta",
+  "materia_id": "M20",
+  "materia": "Campaña de sondajes marinos",
+  "asunto": "Respuesta a observaciones folio 91 - Solicitud de Inicio Campaña de Sondajes Marinos - art. 2.2.2.2.4",
+  "refs": "91;76",
+  "adjuntos": 4,
+  "enlace": "https://drive.google.com/file/d/1fxbtnOpAkPy7E-NP6ZLeiZV4dMN10mx7/view"
  }
 ]
