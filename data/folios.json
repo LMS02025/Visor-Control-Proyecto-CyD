@@ -1678,5 +1678,37 @@
   "refs": "91;76",
   "adjuntos": 4,
   "enlace": "https://drive.google.com/file/d/1fxbtnOpAkPy7E-NP6ZLeiZV4dMN10mx7/view"
+ },
+ {
+  "folio": 106,
+  "fecha": "2026-11-25",
+  "hora": "20:19",
+  "emisor": "IF",
+  "por": "Lorena Araya",
+  "para": "Angel Achau",
+  "tipo": "Entrega Información",
+  "prioridad": "Alta",
+  "materia_id": "M14",
+  "materia": "Programa de Gestión Sustentable (PGS)",
+  "asunto": "Observa Programa de Gestión Sustentable (PGS); Etapa de Construcción - Versión B",
+  "refs": "94;70;48",
+  "adjuntos": 8,
+  "enlace": "https://drive.google.com/file/d/1xfMXWDf7aZ3AeL7gxH579oUwcTpaBtCb/view"
+ },
+ {
+  "folio": 107,
+  "fecha": "2026-11-25",
+  "hora": "20:24",
+  "emisor": "IF",
+  "por": "Lorena Araya",
+  "para": "Angel Achau",
+  "tipo": "Notificación",
+  "prioridad": "Media",
+  "materia_id": "M22",
+  "materia": "Peritos tasadores",
+  "asunto": "Pronunciamiento sobre propuesta de profesionales para integrar la Comisión de Peritos Tasadores Independientes",
+  "refs": "95;81;37;56",
+  "adjuntos": 0,
+  "enlace": "https://drive.google.com/file/d/1DNrLmW8d0RnSUiX74Z4eh78TksHapgu8/view"
  }
 ]

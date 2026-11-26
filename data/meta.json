@@ -1,10 +1,11 @@
 {
- "generado": "2026-11-24T18:56:05+00:00",
- "sincronizado": "2026-11-26T10:56:09+00:00",
+ "generado": "2026-11-26T19:56:33+00:00",
+ "sincronizado": "2026-11-26T19:56:33+00:00",
  "carpeta_drive": "1q2xCr_9fskvGj0mr5VsSYdBaa6WFyalO",
- "folios": 105,
+ "folios": 107,
  "nuevos_ultima_sync": [
-  105
+  106,
+  107
  ],
  "metodo": "Tarea programada de Claude (conector Google Drive)"
 }

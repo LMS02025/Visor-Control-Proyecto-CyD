@@ -120,10 +120,10 @@
   "materia_id": "M14",
   "materia": "Programa de Gestión Sustentable (PGS)",
   "articulo": "Art. 1.9.1.3",
-  "folios": "48;61;70;94;103",
-  "estado": "En revisión",
-  "responde": "IF",
-  "situacion": "IF precisa que la actualización anual del Art. 1.9.1.3.1 no es exigible mientras no exista PGS aprobado; la Rev. B (F94) continúa en revisión de la IF (F103)."
+  "folios": "48;61;70;94;103;106",
+  "estado": "Observado",
+  "responde": "SC",
+  "situacion": "IF observa el PGS Rev. B y sus siete anexos (PAC, PIDU, Prevención de Riesgos, Contingencias, Capacitación Ambiental, Residuos y Sustentabilidad y Energía) y no otorga aprobación; la SC debe presentar versión corregida y consolidada con respuesta a observaciones conforme al Art. 1.10.1.2.1 (F106)."
  },
  {
   "materia_id": "M15",
@@ -192,10 +192,10 @@
   "materia_id": "M22",
   "materia": "Peritos tasadores",
   "articulo": "Art. 1.10.2.1.3",
-  "folios": "37;56;81;95",
-  "estado": "En revisión",
-  "responde": "IF",
-  "situacion": "SC reingresa antecedentes complementarios de los 6 peritos propuestos y circunscribe su función al cálculo del estado de avance; pendiente pronunciamiento IF (F95)."
+  "folios": "37;56;81;95;107",
+  "estado": "Aprobado",
+  "responde": "—",
+  "situacion": "IF emite pronunciamiento favorable para integrar la Comisión de Peritos Tasadores Independientes con F. Toledo Q., L. Bernales G. y C. Gutiérrez G., sin observaciones de idoneidad (F107)."
  },
  {
   "materia_id": "M23",
